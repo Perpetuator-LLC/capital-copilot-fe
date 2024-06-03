@@ -6,7 +6,7 @@ import {
   ApexAxisChartSeries,
   ApexTitleSubtitle,
   ApexXAxis,
-  NgApexchartsModule
+  NgApexchartsModule, ApexTheme
 } from 'ng-apexcharts';
 
 export type ChartOptions = {
@@ -14,12 +14,12 @@ export type ChartOptions = {
   chart: ApexChart;
   xaxis: ApexXAxis;
   title: ApexTitleSubtitle;
+  theme: ApexTheme;
 };
 
 @Component({
   selector: 'app-graph',
   standalone: true,
-  // imports: [],
   imports: [NgApexchartsModule],
   templateUrl: './graph.component.html',
   styleUrls: ['./graph.component.scss']
@@ -27,10 +27,8 @@ export type ChartOptions = {
 export class GraphComponent {
   @ViewChild("chart") chart!: ChartComponent;
   public chartOptions: ChartOptions;
-  // private isBrowser: boolean;
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
-    // this.isBrowser = isPlatformBrowser(this.platformId);
     this.chartOptions = {
       series: [{
         name: "My-series",
@@ -45,13 +43,17 @@ export class GraphComponent {
       },
       xaxis: {
         categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"]
+      },
+      theme: {
+        mode: 'dark',
+        palette: 'palette8',
+        monochrome: {
+          enabled: false,
+          color: '#255aee',
+          shadeTo: 'dark',
+          shadeIntensity: 0.65
+        },
       }
     };
   }
-
-  // ngAfterViewInit(): void {
-  //   if (this.isBrowser) {
-  //     // Initialize or manipulate the chart component here, if necessary
-  //   }
-  // }
 }

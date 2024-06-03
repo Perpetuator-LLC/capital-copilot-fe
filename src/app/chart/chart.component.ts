@@ -40,8 +40,10 @@ export class ChartComponent implements OnInit {
   async ngOnInit() {
     // Do not load Graphs (APEXCHARTS) for SSR (Server Side Rendering)
     if (isPlatformBrowser(this.platformId)) {
-      const { GraphComponent } = await import('../graph/graph.component');
-      this.chartContainer.createComponent(GraphComponent);
+      // const { GraphComponent } = await import('../graph/graph.component');
+      // this.chartContainer.createComponent(GraphComponent);
+      const { CandlestickGraphComponent } = await import('../candlestick-graph/candlestick-graph.component');
+      this.chartContainer.createComponent(CandlestickGraphComponent);
     }
   }
 }
