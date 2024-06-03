@@ -15,4 +15,5 @@ brew install nvm
 ```shell
 nvm install 20.13.1
 nvm use 20.13.1
+echo "20.13.1" > .nvmrc
 ```

@@ -1,4 +1,17 @@
-# 
+# Development
+
+To generate new components:
+
+```shell
+$ ng generate component chart
+CREATE src/app/chart/chart.component.scss (0 bytes)
+CREATE src/app/chart/chart.component.html (20 bytes)
+CREATE src/app/chart/chart.component.spec.ts (589 bytes)
+CREATE src/app/chart/chart.component.ts (231 bytes)
+```
+
+
+# Angular Management
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.0.1.
 
