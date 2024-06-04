@@ -1,5 +1,4 @@
-import { Component, ViewChild, Inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import {Component, ViewChild, Inject, PLATFORM_ID} from '@angular/core';
 import {
   ChartComponent,
   ApexChart,
@@ -28,7 +27,7 @@ export class GraphComponent {
   @ViewChild("chart") chart!: ChartComponent;
   public chartOptions: ChartOptions;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+  constructor() {
     this.chartOptions = {
       series: [{
         name: "My-series",

@@ -1,49 +1,45 @@
 import {
-  AfterViewInit,
-  Component,
-  CUSTOM_ELEMENTS_SCHEMA,
-  Inject,
-  OnInit,
-  PLATFORM_ID,
-  ViewChild,
-  ViewContainerRef
+  Component, EventEmitter, Output,
 } from '@angular/core';
-import {isPlatformBrowser} from "@angular/common";
+import {DataService} from "../data.service";
+import {CandlestickGraphComponent} from "../candlestick-graph/candlestick-graph.component";
+import {FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 
 @Component({
   selector: 'app-chart',
   standalone: true,
-  imports: [],
-  templateUrl: './chart.component.html',
+  imports: [
+    ReactiveFormsModule,
+    CandlestickGraphComponent
+  ],
+  template: `
+    <form [formGroup]="stockForm" (ngSubmit)="onSubmit()">
+      <label for="ticker">
+        Ticker:
+        <input type="text" formControlName="ticker" />
+      </label>
+      <button type="submit" [disabled]="!stockForm.valid">Go!</button>
+    </form>
+  `,
   styleUrl: './chart.component.scss',
-  // schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 
-// export class ChartComponent implements AfterViewInit {
-export class ChartComponent implements OnInit {
-  @ViewChild('chartContainer', { read: ViewContainerRef }) chartContainer!: ViewContainerRef;
+export class ChartComponent {
+  stockForm = new FormGroup({
+    ticker: new FormControl('', Validators.required),
+  })
+  inputText: string = '';
+  @Output() dataEmitter = new EventEmitter<any>();
 
   constructor(
-    @Inject(PLATFORM_ID) private platformId: Object
+    private dataService: DataService
   ) {}
 
-/*
-  async ngAfterViewInit() {
-    // console.log('ViewContainerRef:', this.chartContainer);
-    if (isPlatformBrowser(this.platformId)) {
-      const { GraphComponent } = await import('../graph/graph.component');
-      // console.log('Dynamically Imported Component:', GraphComponent);
-      this.chartContainer.createComponent(GraphComponent);
-    }
+  onSubmit(): void {
+    this.dataService.fetchData(this.inputText).subscribe(data =>{
+      console.log(data);
+      this.dataEmitter.emit(data);
+    })
   }
-*/
-  async ngOnInit() {
-    // Do not load Graphs (APEXCHARTS) for SSR (Server Side Rendering)
-    if (isPlatformBrowser(this.platformId)) {
-      // const { GraphComponent } = await import('../graph/graph.component');
-      // this.chartContainer.createComponent(GraphComponent);
-      const { CandlestickGraphComponent } = await import('../candlestick-graph/candlestick-graph.component');
-      this.chartContainer.createComponent(CandlestickGraphComponent);
-    }
-  }
+
 }

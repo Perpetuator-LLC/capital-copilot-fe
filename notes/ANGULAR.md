@@ -10,6 +10,13 @@ CREATE src/app/chart/chart.component.spec.ts (589 bytes)
 CREATE src/app/chart/chart.component.ts (231 bytes)
 ```
 
+To generate new services:
+```shell
+$ ng generate service data
+CREATE src/app/data.service.spec.ts (347 bytes)
+CREATE src/app/data.service.ts (133 bytes)
+
+```
 
 # Angular Management
 

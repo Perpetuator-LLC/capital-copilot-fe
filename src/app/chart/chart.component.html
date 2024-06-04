@@ -1,10 +1,12 @@
 <section>
-  <form>
-    <input type="text" placeholder="Ticker">
-    <button class="primary" type="button">Load</button>
+  <form (ngSubmit)="onSubmit()">
+    <label for="ticker">Ticker:</label>
+    <input type="text" id="ticker" [(ngModel)]="inputText" name="ticker" required>
+    <button type="submit">Get Data</button>
   </form>
 </section>
-<section class="chart">
-  <ng-template #chartContainer></ng-template>
-<!--  app-graph>/app-graph>-->
-</section>
+<!--<section class="chart">-->
+<!--&lt;!&ndash;  <ng-template #chartContainer></ng-template>&ndash;&gt;-->
+<!--  Winning!-->
+<!--  <app-candlestick-graph></app-candlestick-graph>-->
+<!--</section>-->
