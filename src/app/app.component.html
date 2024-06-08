@@ -227,6 +227,12 @@
       </svg>
       <h1>Hello, {{ title }}</h1>
       <p>Congratulations! Your app is running. 🎉</p>
+      <nav>
+        <a routerLink="/">Home</a>
+        <a routerLink="/login" *ngIf="!authService.isLoggedIn()">Login</a>
+        <button (click)="logout()" *ngIf="authService.isLoggedIn()">Logout</button>
+      </nav>
+      <router-outlet></router-outlet>
       <app-chart />
       <app-candlestick-graph />
     </div>

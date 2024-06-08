@@ -28,7 +28,7 @@ export class ChartComponent {
   stockForm = new FormGroup({
     ticker: new FormControl('', Validators.required),
   })
-  inputText: string = '';
+  // inputText: string = '';
   @Output() dataEmitter = new EventEmitter<any>();
 
   constructor(
@@ -36,7 +36,7 @@ export class ChartComponent {
   ) {}
 
   onSubmit(): void {
-    this.dataService.fetchData(this.inputText).subscribe(data =>{
+    this.dataService.fetchData(this.stockForm.value.ticker).subscribe(data =>{
       console.log(data);
       this.dataEmitter.emit(data);
     })

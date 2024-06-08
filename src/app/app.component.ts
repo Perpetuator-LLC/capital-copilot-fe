@@ -1,24 +1,31 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { ChartComponent } from "./chart/chart.component";
-import {CandlestickGraphComponent} from "./candlestick-graph/candlestick-graph.component";
-import {DataService} from "./data.service";
+import { RouterLink, RouterOutlet } from '@angular/router';
+import { AuthService } from "./auth.service";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, ChartComponent, CandlestickGraphComponent],
+  imports: [RouterLink, RouterOutlet],
   template: `
-    <app-chart (dataEmitter)="handleData($event)"></app-chart>
-    <app-candlestick-graph [dataSource]="dataSource"></app-candlestick-graph>
+    <nav>
+      <a routerLink="/">Home</a> |
+      @if (this.authService.isLoggedIn()) {
+        <button (click)="logout()">Logout</button>
+      } @else {
+        <a routerLink="/login">Login</a>
+      }
+      <router-outlet></router-outlet>
+    </nav>
   `,
   // templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
   title = 'capital-copilot-fe';
-  dataSource: any;
-  handleData(data: any) {
-    this.dataSource = data;
+  constructor(public authService: AuthService) {}
+
+  logout() {
+    this.authService.logout();
   }
+
 }
