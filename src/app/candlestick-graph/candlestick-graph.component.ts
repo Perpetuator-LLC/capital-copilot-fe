@@ -29,19 +29,19 @@ export type ChartOptions = {
   templateUrl: './candlestick-graph.component.html',
 })
 export class CandlestickGraphComponent implements OnChanges, AfterViewInit {
-  public chartCandleOptions: ChartOptions;
-  public chartBarOptions: ChartOptions;
+  public candleOptions: ChartOptions;
+  public volumeOptions: ChartOptions;
   private fullStartDate: number | undefined;
   private zoomStartDate: number | undefined;
   private fullEndDate: number | undefined;
   @Input() dataSource: any;
-  @Output() chartDoubleClicked = new EventEmitter<MouseEvent>();
+  @Output() candleDoubleClicked = new EventEmitter<MouseEvent>();
   @Output() volumeDoubleClicked = new EventEmitter<MouseEvent>();
-  @ViewChild('chartCandle') chartCandle: ChartComponent | undefined;
-  @ViewChild('chartBar') chartBar: ChartComponent | undefined;
+  @ViewChild('chartCandle') candleChart: ChartComponent | undefined;
+  @ViewChild('chartBar') volumeChart: ChartComponent | undefined;
 
   constructor() {
-    this.chartCandleOptions = {
+    this.candleOptions = {
       series: [],
       chart: {
         type: 'candlestick',
@@ -56,7 +56,7 @@ export class CandlestickGraphComponent implements OnChanges, AfterViewInit {
         },
         events: {
           click: (event, chartContext, config) => {
-            this.handleChartClick(event);
+            this.handleCandleClick(event);
           },
         },
       },
@@ -76,7 +76,7 @@ export class CandlestickGraphComponent implements OnChanges, AfterViewInit {
       stroke: {},
     };
 
-    this.chartBarOptions = {
+    this.volumeOptions = {
       series: [],
       chart: {
         height: 160,
@@ -136,7 +136,7 @@ export class CandlestickGraphComponent implements OnChanges, AfterViewInit {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['dataSource']) {
       console.log('Data Source changed:', this.dataSource);
-      this.updateChartOptions();
+      this.updateCandleOptions();
       this.setDateRange();
       this.resetZoom();
     }
@@ -171,10 +171,10 @@ export class CandlestickGraphComponent implements OnChanges, AfterViewInit {
     this.resetZoom();
   }
 
-  updateChartOptions() {
+  updateCandleOptions() {
     if (this.dataSource) {
-      this.chartCandleOptions = {
-        ...this.chartCandleOptions,
+      this.candleOptions = {
+        ...this.candleOptions,
         series: [
           {
             name: 'candle',
@@ -183,8 +183,8 @@ export class CandlestickGraphComponent implements OnChanges, AfterViewInit {
         ],
       };
 
-      this.chartBarOptions = {
-        ...this.chartBarOptions,
+      this.volumeOptions = {
+        ...this.volumeOptions,
         series: [
           {
             name: 'volume',
@@ -195,16 +195,16 @@ export class CandlestickGraphComponent implements OnChanges, AfterViewInit {
     }
   }
 
-  handleChartClick(event: MouseEvent) {
+  handleCandleClick(event: MouseEvent) {
     if (event.detail === 2) { // Double click
       this.resetZoom();
-      this.chartDoubleClicked.emit(event);  // Emit the event instead of handling it directly
+      this.candleDoubleClicked.emit(event);  // Emit the event instead of handling it directly
     }
   }
 
   resetZoom() {
-    if (this.chartCandle && this.zoomStartDate && this.fullEndDate) {
-      this.chartCandle.zoomX(this.zoomStartDate, this.fullEndDate);
+    if (this.candleChart && this.zoomStartDate && this.fullEndDate) {
+      this.candleChart.zoomX(this.zoomStartDate, this.fullEndDate);
     }
   }
 
@@ -216,8 +216,8 @@ export class CandlestickGraphComponent implements OnChanges, AfterViewInit {
   }
 
   fullZoom() {
-    if (this.chartCandle && this.fullStartDate && this.fullEndDate) {
-      this.chartCandle.zoomX(this.fullStartDate, this.fullEndDate);
+    if (this.candleChart && this.fullStartDate && this.fullEndDate) {
+      this.candleChart.zoomX(this.fullStartDate, this.fullEndDate);
     }
   }
 }

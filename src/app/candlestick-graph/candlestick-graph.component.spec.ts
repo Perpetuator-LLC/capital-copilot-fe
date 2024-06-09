@@ -48,10 +48,10 @@ describe('CandlestickGraphComponent', () => {
       }
     });
 
-    expect(component.chartCandleOptions.series.length).toBe(1);
-    expect(component.chartCandleOptions.series[0].data).toEqual(dataSource.ohlc);
-    expect(component.chartBarOptions.series.length).toBe(1);
-    expect(component.chartBarOptions.series[0].data).toEqual(dataSource.volume);
+    expect(component.candleOptions.series.length).toBe(1);
+    expect(component.candleOptions.series[0].data).toEqual(dataSource.ohlc);
+    expect(component.volumeOptions.series.length).toBe(1);
+    expect(component.volumeOptions.series[0].data).toEqual(dataSource.volume);
   });
 
   it('should set date range correctly', () => {
@@ -75,19 +75,19 @@ describe('CandlestickGraphComponent', () => {
   });
 
   it('should emit an event when the chart is clicked', () => {
-    spyOn(component.chartDoubleClicked, 'emit');
+    spyOn(component.candleDoubleClicked, 'emit');
     const event = new MouseEvent('click', { detail: 2 });
-    if (component.chartCandleOptions.chart?.events?.click) {
-      component.chartCandleOptions.chart.events.click(event, {}, {});
+    if (component.candleOptions.chart?.events?.click) {
+      component.candleOptions.chart.events.click(event, {}, {});
     }
-    expect(component.chartDoubleClicked.emit).toHaveBeenCalledWith(event);
+    expect(component.candleDoubleClicked.emit).toHaveBeenCalledWith(event);
   });
 
   it('should emit an event when the volume is clicked', () => {
     spyOn(component.volumeDoubleClicked, 'emit');
     const event = new MouseEvent('click', { detail: 2 });
-    if (component.chartBarOptions.chart?.events?.click) {
-      component.chartBarOptions.chart.events.click(event, {}, {});
+    if (component.volumeOptions.chart?.events?.click) {
+      component.volumeOptions.chart.events.click(event, {}, {});
     }
     expect(component.volumeDoubleClicked.emit).toHaveBeenCalledWith(event);
   });
@@ -95,8 +95,8 @@ describe('CandlestickGraphComponent', () => {
   it('should reset zoom on double click on candlestick chart', () => {
     spyOn(component, 'resetZoom');
     const event = new MouseEvent('click', { detail: 2 });
-    if (component.chartCandleOptions.chart?.events?.click) {
-      component.chartCandleOptions.chart.events.click(event, {}, {});
+    if (component.candleOptions.chart?.events?.click) {
+      component.candleOptions.chart.events.click(event, {}, {});
 
     }
     expect(component.resetZoom).toHaveBeenCalled();
@@ -105,8 +105,8 @@ describe('CandlestickGraphComponent', () => {
   it('should reset zoom on double click on candlestick volume', () => {
     spyOn(component, 'fullZoom');
     const event = new MouseEvent('click', { detail: 2 });
-    if (component.chartBarOptions.chart?.events?.click) {
-      component.chartBarOptions.chart.events.click(event, {}, {});
+    if (component.volumeOptions.chart?.events?.click) {
+      component.volumeOptions.chart.events.click(event, {}, {});
 
     }
     expect(component.fullZoom).toHaveBeenCalled();
