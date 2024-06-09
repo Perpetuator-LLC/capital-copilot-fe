@@ -56,7 +56,6 @@ describe('ChartComponent', () => {
     spyOn(component.dataEmitter, 'emit');
 
     component.stockForm.controls['ticker'].setValue('AAPL');
-    component.inputText = 'AAPL';
     fixture.detectChanges();
 
     const form = fixture.debugElement.query(By.css('form'));

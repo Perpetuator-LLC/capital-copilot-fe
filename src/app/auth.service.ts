@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import {BehaviorSubject, catchError, Observable, of, switchMap} from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, BehaviorSubject, of } from 'rxjs';
+import { tap, switchMap, catchError } from 'rxjs/operators';
 
+// TODO: refactor this function to a utility file
 function decodeJWT(token: string): any {
   const base64Url = token.split('.')[1];
   const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -34,17 +35,12 @@ export class AuthService {
     );
   }
 
-  // constructor(private http: HttpClient) {}
-  //
-  // login(username: string, password: string): Observable<any> {
-  //   return this.http.post<any>(this.tokenUrl, { username, password }).pipe(
-  //     tap(response => this.setSession(response))
-  //   );
-  // }
-
-  // This method is used to refresh the token using the stored refresh token
   refreshToken(): Observable<any> {
     const refreshToken = this.getRefreshToken();
+    if (!refreshToken || this.isRefreshTokenExpired()) {
+      this.logout();
+      return of(null);
+    }
     return this.http.post<any>(this.refreshTokenUrl, { refresh: refreshToken }).pipe(
       tap(response => this.updateSession(response)),
       catchError(error => {
@@ -54,37 +50,40 @@ export class AuthService {
     );
   }
 
-  // Store the access and refresh tokens in localStorage
   private setSession(authResult: any) {
     const accessToken = authResult.access;
     const refreshToken = authResult.refresh;
 
-    // Decode the refresh token to extract expiration time
+    const decodedAccessToken: any = decodeJWT(accessToken);
+    const accessExpiresAt = decodedAccessToken.exp * 1000;
+
     const decodedRefreshToken: any = decodeJWT(refreshToken);
-    const expiresAt = decodedRefreshToken.exp * 1000; // exp is in seconds, convert to milliseconds
+    const refreshExpiresAt = decodedRefreshToken.exp * 1000;
 
     localStorage.setItem('id_token', accessToken);
-    localStorage.setItem('refresh_token', refreshToken); // Storing refresh token
-    localStorage.setItem('expires_at', JSON.stringify(expiresAt));
+    localStorage.setItem('refresh_token', refreshToken);
+    localStorage.setItem('expires_at', JSON.stringify(accessExpiresAt));
+    localStorage.setItem('refresh_expires_at', JSON.stringify(refreshExpiresAt));
 
     this.tokenSubject.next(accessToken);
   }
 
-  // Update the access token and expiry in localStorage
   private updateSession(authResult: any) {
     const accessToken = authResult.access;
-    const expiresAt = new Date().getTime() + authResult.expires_in * 1000;
+    const decodedAccessToken: any = decodeJWT(accessToken);
+    const accessExpiresAt = decodedAccessToken.exp * 1000;
 
-    localStorage.setItem('id_token', authResult.access); // Update the access token
-    localStorage.setItem('expires_at', JSON.stringify(expiresAt));
+    localStorage.setItem('id_token', accessToken);
+    localStorage.setItem('expires_at', JSON.stringify(accessExpiresAt));
 
     this.tokenSubject.next(accessToken);
   }
 
   logout() {
     localStorage.removeItem('id_token');
-    localStorage.removeItem('refresh_token'); // Ensure refresh token is also cleared
+    localStorage.removeItem('refresh_token');
     localStorage.removeItem('expires_at');
+    localStorage.removeItem('refresh_expires_at');
     this.tokenSubject.next(null);
   }
 
@@ -98,15 +97,28 @@ export class AuthService {
   }
 
   public getTokenObservable(): Observable<string | null> {
-    if (!this.isLoggedIn()) {
-      return this.refreshToken().pipe(
-        switchMap(() => of(this.getToken()))
-      );
+    const token = this.getToken();
+    if (this.isRefreshTokenExpired()) {
+      this.logout();
+      return of(null);
+    } else if (token && !this.isTokenExpired()) {
+      return of(token);
     }
-    return this.tokenSubject.asObservable();
+    return this.refreshToken().pipe(
+      switchMap(() => of(this.getToken()))
+    );
   }
 
-  // Method to retrieve the refresh token from localStorage
+  private isTokenExpired(): boolean {
+    const expiration = localStorage.getItem('expires_at');
+    return expiration !== null && new Date().getTime() >= JSON.parse(expiration);
+  }
+
+  public isRefreshTokenExpired(): boolean {
+    const refreshExpiration = localStorage.getItem('refresh_expires_at');
+    return refreshExpiration !== null && new Date().getTime() >= JSON.parse(refreshExpiration);
+  }
+
   private getRefreshToken(): string | null {
     return localStorage.getItem('refresh_token');
   }

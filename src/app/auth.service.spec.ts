@@ -2,6 +2,22 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { AuthService } from './auth.service';
 
+function createTestJWT(payload: any, expiresIn: number = 3600): string {
+  const header = {
+    alg: 'HS256',
+    typ: 'JWT'
+  };
+  const encodedHeader = btoa(JSON.stringify(header));
+  const iat = Math.floor(Date.now() / 1000);
+  payload.iat = payload.iat || iat;
+  payload.exp = payload.exp || (iat + expiresIn); // Default expiry: 1 hour
+  const encodedPayload = btoa(JSON.stringify(payload));
+
+  // Typically a real JWT would be signed, but for testing we can just concatenate
+  // the parts with a fake signature
+  return `${encodedHeader}.${encodedPayload}.fake-signature`;
+}
+
 describe('AuthService', () => {
   let service: AuthService;
   let httpMock: HttpTestingController;
@@ -25,9 +41,11 @@ describe('AuthService', () => {
   });
 
   it('should login and set session', () => {
+    const accessToken = createTestJWT({});
+    const refreshToken = createTestJWT({}, 3600*24);
     const mockResponse = {
-      access: 'access-token',
-      refresh: 'refresh-token',
+      access: accessToken,
+      refresh: refreshToken,
       expires_in: 3600
     };
 
@@ -44,8 +62,9 @@ describe('AuthService', () => {
   });
 
   it('should refresh token and update session', () => {
+    const token = createTestJWT({});
     const mockResponse = {
-      access: 'new-access-token',
+      access: token,
       expires_in: 3600
     };
 
