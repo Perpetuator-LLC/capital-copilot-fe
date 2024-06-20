@@ -1,0 +1,41 @@
+@if (dataSource?.data?.loading) {
+  <div>
+    <div class="loading-indicator">
+      <!-- TODO: Add spinner or chart overlay with Material UI -->
+      <p>Loading data, please wait...</p>
+    </div>
+  </div>
+} @else if (dataSource?.data?.error) {
+  <div>
+    <div class="error">
+      <p>Error: {{ dataSource.data.error }}</p>
+    </div>
+  </div>
+} @else {
+  <div class="chart-box">
+    <div id="chart-candlestick">
+      <apx-chart
+        #chartCandlePrice
+        [series]="candlePriceOptions.series"
+        [chart]="candlePriceOptions.chart"
+        [xaxis]="candlePriceOptions.xaxis"
+        [yaxis]="candlePriceOptions.yaxis"
+        [tooltip]="candlePriceOptions.tooltip"
+        [plotOptions]="candlePriceOptions.plotOptions"
+      ></apx-chart>
+    </div>
+    <div id="chart-bar">
+      <apx-chart
+        #chartBarVolume
+        [series]="barVolumeOptions.series"
+        [chart]="barVolumeOptions.chart"
+        [xaxis]="barVolumeOptions.xaxis"
+        [yaxis]="barVolumeOptions.yaxis"
+        [dataLabels]="barVolumeOptions.dataLabels"
+        [stroke]="barVolumeOptions.stroke"
+        [plotOptions]="barVolumeOptions.plotOptions"
+      ></apx-chart>
+    </div>
+  <!--  <div>Data: { { dataSource | json }}</div>-->
+  </div>
+}

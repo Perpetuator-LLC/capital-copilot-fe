@@ -8,7 +8,18 @@ import {
   Output,
   EventEmitter
 } from '@angular/core';
-import { ChartComponent, ApexAxisChartSeries, ApexChart, ApexXAxis, ApexYAxis, ApexPlotOptions, ApexDataLabels, ApexStroke, NgApexchartsModule } from 'ng-apexcharts';
+import {
+  ChartComponent,
+  ApexAxisChartSeries,
+  ApexChart,
+  ApexXAxis,
+  ApexYAxis,
+  ApexPlotOptions,
+  ApexDataLabels,
+  ApexStroke,
+  NgApexchartsModule,
+  ApexTooltip
+} from 'ng-apexcharts';
 import { JsonPipe } from '@angular/common';
 
 export type ChartOptions = {
@@ -16,6 +27,7 @@ export type ChartOptions = {
   chart: ApexChart;
   xaxis: ApexXAxis;
   yaxis: ApexYAxis;
+  tooltip: ApexTooltip;
   plotOptions: ApexPlotOptions;
   dataLabels: ApexDataLabels;
   stroke: ApexStroke;
@@ -23,29 +35,29 @@ export type ChartOptions = {
 
 @Component({
   imports: [NgApexchartsModule, JsonPipe],
-  selector: 'app-candlestick-graph',
+  selector: 'candlestick-chart',
   standalone: true,
-  styleUrls: ['./candlestick-graph.component.scss'],
-  templateUrl: './candlestick-graph.component.html',
+  styleUrls: ['./candlestick-chart.component.scss'],
+  templateUrl: './candlestick-chart.component.html',
 })
-export class CandlestickGraphComponent implements OnChanges, AfterViewInit {
-  public candleOptions: ChartOptions;
-  public volumeOptions: ChartOptions;
+export class CandlestickChartComponent implements OnChanges, AfterViewInit {
+  public candlePriceOptions: ChartOptions;
+  public barVolumeOptions: ChartOptions;
   private fullStartDate: number | undefined;
   private zoomStartDate: number | undefined;
   private fullEndDate: number | undefined;
   @Input() dataSource: any;
   @Output() candleDoubleClicked = new EventEmitter<MouseEvent>();
   @Output() volumeDoubleClicked = new EventEmitter<MouseEvent>();
-  @ViewChild('chartCandle') candleChart: ChartComponent | undefined;
-  @ViewChild('chartBar') volumeChart: ChartComponent | undefined;
+  @ViewChild('chartCandlePrice') candlePriceChart: ChartComponent | undefined;
+  @ViewChild('chartBarVolume') barVolumeChart: ChartComponent | undefined;
 
   constructor() {
-    this.candleOptions = {
+    this.candlePriceOptions = {
       series: [],
       chart: {
         type: 'candlestick',
-        height: 290,
+        height: 480,
         id: 'candles',
         toolbar: {
           autoSelected: 'zoom',
@@ -60,23 +72,54 @@ export class CandlestickGraphComponent implements OnChanges, AfterViewInit {
           },
         },
       },
+      tooltip: {
+        enabled: true,
+        followCursor: false,
+        custom: function({ series, seriesIndex, dataPointIndex, w }) {
+          const o = w.globals.seriesCandleO[seriesIndex][dataPointIndex];
+          const h = w.globals.seriesCandleH[seriesIndex][dataPointIndex];
+          const l = w.globals.seriesCandleL[seriesIndex][dataPointIndex];
+          const c = w.globals.seriesCandleC[seriesIndex][dataPointIndex];
+          return (
+            '<div class="apexcharts-tooltip-candlestick">' +
+              '<pre>' +
+                '<span>Open: ' + o + '</span> | ' +
+                '<span>High: ' + h + '</span> | ' +
+                '<span>Low: ' + l + '</span> | ' +
+                '<span>Close: ' + c + '</span>' +
+              '</pre>' +
+            '</div>'
+          );
+        },
+        fixed: {
+          enabled: true,
+          position: 'topLeft',
+          offsetX: 50,
+        },
+      },
       plotOptions: {
         candlestick: {
           colors: {
-            upward: '#3C90EB',
-            downward: '#DF7D46',
+            upward: '#3ceb59',
+            downward: '#df4646',
           },
         },
       },
       xaxis: {
         type: 'datetime',
       },
-      yaxis: {},
+      yaxis: {
+        opposite: true,
+        labels: {
+          show: true,
+          align: 'left',
+        },
+      },
       dataLabels: {},
       stroke: {},
     };
 
-    this.volumeOptions = {
+    this.barVolumeOptions = {
       series: [],
       chart: {
         height: 160,
@@ -96,6 +139,9 @@ export class CandlestickGraphComponent implements OnChanges, AfterViewInit {
       },
       dataLabels: {
         enabled: false,
+      },
+      tooltip: {
+
       },
       plotOptions: {
         bar: {
@@ -126,8 +172,10 @@ export class CandlestickGraphComponent implements OnChanges, AfterViewInit {
         },
       },
       yaxis: {
+        opposite: true,
         labels: {
-          show: false,
+          show: true,
+          align: 'left',
         },
       },
     };
@@ -172,9 +220,9 @@ export class CandlestickGraphComponent implements OnChanges, AfterViewInit {
   }
 
   updateCandleOptions() {
-    if (this.dataSource) {
-      this.candleOptions = {
-        ...this.candleOptions,
+    if (this.dataSource && this.dataSource['ohlc']) {
+      this.candlePriceOptions = {
+        ...this.candlePriceOptions,
         series: [
           {
             name: 'candle',
@@ -182,15 +230,27 @@ export class CandlestickGraphComponent implements OnChanges, AfterViewInit {
           },
         ],
       };
+    } else {
+      this.candlePriceOptions = {
+        ...this.candlePriceOptions,
+        series: [ ],
+      };
+    }
 
-      this.volumeOptions = {
-        ...this.volumeOptions,
+    if (this.dataSource && this.dataSource['volume']) {
+      this.barVolumeOptions = {
+        ...this.barVolumeOptions,
         series: [
           {
             name: 'volume',
             data: this.dataSource['volume'],
           },
         ],
+      };
+    } else {
+      this.barVolumeOptions = {
+        ...this.barVolumeOptions,
+        series: [ ],
       };
     }
   }
@@ -203,8 +263,8 @@ export class CandlestickGraphComponent implements OnChanges, AfterViewInit {
   }
 
   resetZoom() {
-    if (this.candleChart && this.zoomStartDate && this.fullEndDate) {
-      this.candleChart.zoomX(this.zoomStartDate, this.fullEndDate);
+    if (this.candlePriceChart && this.zoomStartDate && this.fullEndDate) {
+      this.candlePriceChart.zoomX(this.zoomStartDate, this.fullEndDate);
     }
   }
 
@@ -216,8 +276,8 @@ export class CandlestickGraphComponent implements OnChanges, AfterViewInit {
   }
 
   fullZoom() {
-    if (this.candleChart && this.fullStartDate && this.fullEndDate) {
-      this.candleChart.zoomX(this.fullStartDate, this.fullEndDate);
+    if (this.candlePriceChart && this.fullStartDate && this.fullEndDate) {
+      this.candlePriceChart.zoomX(this.fullStartDate, this.fullEndDate);
     }
   }
 }

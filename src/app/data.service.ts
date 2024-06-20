@@ -1,28 +1,48 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { AuthService } from './auth.service'; // Adjust the import path as necessary
+import { HttpClient } from '@angular/common/http';
+import {Observable, of, throwError} from 'rxjs';
+import {catchError, map} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DataService {
-  private url = `http://127.0.0.1:8000/api/`;
+  private url = `http://127.0.0.1:8000/graphql/`; // Adjusted for the GraphQL endpoint
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(private http: HttpClient) {}
 
   fetchData(ticker: string | null | undefined): Observable<any> {
     if (!ticker) {
-      return new Observable();
+      return of(null); // Return an Observable emitting `null` if no ticker
     }
-    const body = { ticker }; // Using inputText to set the ticker value dynamically
-    const token = this.authService.getToken();
-
-    let headers = new HttpHeaders();
-    if (token) {
-      headers = headers.set('Authorization', `Bearer ${token}`);
-    }
-
-    return this.http.post<any>(this.url, body, { headers });
+    const query = {
+      query: `{
+        getChartData(ticker: "${ticker}") {
+          success
+          message
+          ohlc {
+            x
+            y
+          }
+          volume {
+            x
+            y
+          }
+          ticker
+        }
+      }`
+    };
+    return this.http.post<any>(this.url, query).pipe(
+      map(response => {
+        if (response.errors) {
+          throw new Error(response.errors.map((err: any) => err.message).join(', '));
+        }
+        return response.data.getChartData;
+      }),
+      catchError(error => {
+        console.error('GraphQL query error:', error);
+        return throwError(() => new Error('Failed to fetch chart data: ' + error.message));
+      })
+    );
   }
 }

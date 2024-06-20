@@ -36,6 +36,7 @@ export class AuthService {
   }
 
   refreshToken(): Observable<any> {
+    // console.log("Refreshing token...");
     const refreshToken = this.getRefreshToken();
     if (!refreshToken || this.isRefreshTokenExpired()) {
       this.logout();
@@ -56,9 +57,13 @@ export class AuthService {
 
     const decodedAccessToken: any = decodeJWT(accessToken);
     const accessExpiresAt = decodedAccessToken.exp * 1000;
+    // console.log('Access Token Expiry:', new Date(accessExpiresAt));
+
 
     const decodedRefreshToken: any = decodeJWT(refreshToken);
     const refreshExpiresAt = decodedRefreshToken.exp * 1000;
+    // console.log('Refresh Token Expiry:', new Date(refreshExpiresAt));
+
 
     localStorage.setItem('id_token', accessToken);
     localStorage.setItem('refresh_token', refreshToken);
@@ -84,12 +89,12 @@ export class AuthService {
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('expires_at');
     localStorage.removeItem('refresh_expires_at');
+    // console.log('Logged out');
     this.tokenSubject.next(null);
   }
 
   public isLoggedIn(): boolean {
-    const expiration = localStorage.getItem('expires_at');
-    return expiration !== null && new Date().getTime() < JSON.parse(expiration);
+    return !this.isRefreshTokenExpired();
   }
 
   public getToken(): string | null {
@@ -111,12 +116,12 @@ export class AuthService {
 
   private isTokenExpired(): boolean {
     const expiration = localStorage.getItem('expires_at');
-    return expiration !== null && new Date().getTime() >= JSON.parse(expiration);
+    return expiration === null || expiration === undefined || new Date().getTime() >= JSON.parse(expiration);
   }
 
   public isRefreshTokenExpired(): boolean {
     const refreshExpiration = localStorage.getItem('refresh_expires_at');
-    return refreshExpiration !== null && new Date().getTime() >= JSON.parse(refreshExpiration);
+    return refreshExpiration === null || refreshExpiration === undefined || new Date().getTime() >= JSON.parse(refreshExpiration);
   }
 
   private getRefreshToken(): string | null {

@@ -1,17 +1,17 @@
 import { Component } from '@angular/core';
-import {ChartComponent} from "../chart/chart.component";
-import {CandlestickGraphComponent} from "../candlestick-graph/candlestick-graph.component";
 import {AuthService} from "../auth.service";
+import {CandlestickChartComponent} from "../candlestick-chart/candlestick-chart.component";
+import {ChartControlComponent} from "../chart-control/chart-control.component";
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [ChartComponent, CandlestickGraphComponent],
+  imports: [ChartControlComponent, CandlestickChartComponent],
   template: `
     <h1>Welcome to Capital Copilot!</h1>
     @if (authService.isLoggedIn()) {
-      <app-chart (dataEmitter)="handleData($event)"></app-chart>
-      <app-candlestick-graph [dataSource]="dataSource"></app-candlestick-graph>
+      <chart-control (dataEmitter)="handleData($event)"></chart-control>
+      <candlestick-chart [dataSource]="dataSource"></candlestick-chart>
     } @else {
       <p>Please login to use the app.</p>
     }
@@ -20,7 +20,7 @@ import {AuthService} from "../auth.service";
   styleUrl: './landing.component.scss'
 })
 export class LandingComponent {
-  dataSource: any;
+  dataSource: any = {ticker: ""};
 
   constructor(public authService: AuthService) {}
 
@@ -28,3 +28,4 @@ export class LandingComponent {
     this.dataSource = data;
   }
 }
+

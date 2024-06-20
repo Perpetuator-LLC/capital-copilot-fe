@@ -233,8 +233,8 @@
         <button (click)="logout()" *ngIf="authService.isLoggedIn()">Logout</button>
       </nav>
       <router-outlet></router-outlet>
-      <app-chart />
-      <app-candlestick-graph />
+      <chart-control />
+      <candlestick-chart />
     </div>
     <div class="divider" role="separator" aria-label="Divider"></div>
     <div class="right-side">

@@ -1,25 +1,25 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ChartComponent } from './chart.component';
+import { ChartControlComponent } from './chart-control.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { DataService } from '../data.service';
 import { of } from 'rxjs';
 import { By } from '@angular/platform-browser';
 
 describe('ChartComponent', () => {
-  let component: ChartComponent;
-  let fixture: ComponentFixture<ChartComponent>;
+  let component: ChartControlComponent;
+  let fixture: ComponentFixture<ChartControlComponent>;
   let dataService: jasmine.SpyObj<DataService>;
 
   beforeEach(async () => {
     const dataServiceSpy = jasmine.createSpyObj('DataService', ['fetchData']);
 
     await TestBed.configureTestingModule({
-      imports: [ChartComponent, ReactiveFormsModule],
+      imports: [ChartControlComponent, ReactiveFormsModule],
       providers: [{ provide: DataService, useValue: dataServiceSpy }]
     })
       .compileComponents();
 
-    fixture = TestBed.createComponent(ChartComponent);
+    fixture = TestBed.createComponent(ChartControlComponent);
     component = fixture.componentInstance;
     dataService = TestBed.inject(DataService) as jasmine.SpyObj<DataService>;
     fixture.detectChanges();
