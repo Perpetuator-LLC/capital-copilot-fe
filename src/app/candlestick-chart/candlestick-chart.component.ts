@@ -18,7 +18,8 @@ import {
   ApexDataLabels,
   ApexStroke,
   NgApexchartsModule,
-  ApexTooltip
+  ApexTooltip,
+  ApexAnnotations
 } from 'ng-apexcharts';
 import { JsonPipe } from '@angular/common';
 
@@ -31,6 +32,7 @@ export type ChartOptions = {
   plotOptions: ApexPlotOptions;
   dataLabels: ApexDataLabels;
   stroke: ApexStroke;
+  annotations: ApexAnnotations;
 };
 
 @Component({
@@ -43,6 +45,7 @@ export type ChartOptions = {
 export class CandlestickChartComponent implements OnChanges, AfterViewInit {
   public candlePriceOptions: ChartOptions;
   public barVolumeOptions: ChartOptions;
+  public squeezeChartOptions: ChartOptions;
   private fullStartDate: number | undefined;
   private zoomStartDate: number | undefined;
   private fullEndDate: number | undefined;
@@ -117,6 +120,7 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
       },
       dataLabels: {},
       stroke: {},
+      annotations: {}
     };
 
     this.barVolumeOptions = {
@@ -178,6 +182,69 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
           align: 'left',
         },
       },
+      annotations: {}
+    };
+
+    this.squeezeChartOptions = {
+      series: [],
+      chart: {
+        height: 160,
+        type: 'bar',
+        brush: {
+          enabled: true,
+          target: 'candles',
+        },
+        selection: {
+          enabled: true,
+        },
+        events: {
+          click: (event, chartContext, config) => {
+            this.handleVolumeClick(event);
+          },
+        },
+      },
+      dataLabels: {
+        enabled: false,
+      },
+      tooltip: {
+
+      },
+      plotOptions: {
+        bar: {
+          columnWidth: '80%',
+          colors: {
+            ranges: [
+              {
+                from: -1000,
+                to: 0,
+                color: '#F15B46',
+              },
+              {
+                from: 1,
+                to: 10000,
+                color: '#FEB019',
+              },
+            ],
+          },
+        },
+      },
+      stroke: {
+        width: 0,
+      },
+      xaxis: {
+        type: 'datetime',
+        axisBorder: {
+          offsetX: 13,
+        },
+      },
+      yaxis: {
+        opposite: true,
+        labels: {
+          show: true,
+          align: 'left',
+        },
+      },
+      annotations: {}
     };
   }
 
@@ -185,6 +252,7 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
     if (changes['dataSource']) {
       console.log('Data Source changed:', this.dataSource);
       this.updateCandleOptions();
+      this.updateSqueezeChartOptions();
       this.setDateRange();
       this.resetZoom();
     }
@@ -254,6 +322,63 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
       };
     }
   }
+
+  updateSqueezeChartOptions() {
+    if (this.dataSource && this.dataSource['squeeze']) {
+      const annotations: ApexAnnotations = {
+        points: []
+      };
+
+      this.dataSource['squeeze'].forEach((data: {x: string, y: number[]}) => {
+        if (data.y[0] === 0) { // Assuming '1' indicates Squeeze On
+          annotations.points?.push({
+            x: new Date(data.x).getTime(),
+            y: 0,
+            marker: {
+              size: 5,
+              fillColor: '#00FF00', // Green dot for Squeeze On
+              shape: 'circle'
+            },
+            label: {
+              borderColor: '#00FF00',
+              text: 'On'
+            }
+          });
+        } else if (data.y[0] === 1) { // Assuming '0' indicates Squeeze Off
+          annotations.points?.push({
+            x: new Date(data.x).getTime(),
+            y: 0,
+            marker: {
+              size: 5,
+              fillColor: '#FF0000', // Red dot for Squeeze Off
+              shape: 'circle'
+            },
+            label: {
+              borderColor: '#FF0000',
+              text: 'Off'
+            }
+          });
+        }
+      });
+
+      this.squeezeChartOptions = {
+        ...this.squeezeChartOptions,
+        annotations: annotations,
+        series: [
+          {
+            name: 'squeeze',
+            data: this.dataSource['squeeze'],
+          },
+        ],
+      };
+    } else {
+      this.squeezeChartOptions = {
+        ...this.squeezeChartOptions,
+        series: [],
+      };
+    }
+  }
+
 
   handleCandleClick(event: MouseEvent) {
     if (event.detail === 2) { // Double click

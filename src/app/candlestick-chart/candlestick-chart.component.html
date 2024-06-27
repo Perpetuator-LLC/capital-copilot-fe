@@ -36,6 +36,19 @@
         [plotOptions]="barVolumeOptions.plotOptions"
       ></apx-chart>
     </div>
-  <!--  <div>Data: { { dataSource | json }}</div>-->
+    <div id="chart-squeeze">
+      <apx-chart
+        #chartSqueeze
+        [series]="squeezeChartOptions.series"
+        [chart]="squeezeChartOptions.chart"
+        [xaxis]="squeezeChartOptions.xaxis"
+        [yaxis]="squeezeChartOptions.yaxis"
+        [dataLabels]="squeezeChartOptions.dataLabels"
+        [stroke]="squeezeChartOptions.stroke"
+        [plotOptions]="squeezeChartOptions.plotOptions"
+        [annotations]="squeezeChartOptions.annotations"
+      ></apx-chart>
+    </div>
+    <!--  <div>Data: { { dataSource | json }}</div>-->
   </div>
 }

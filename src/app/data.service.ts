@@ -17,20 +17,24 @@ export class DataService {
     }
     const query = {
       query: `{
-        getChartData(ticker: "${ticker}") {
-          success
-          message
-          ohlc {
-            x
-            y
-          }
-          volume {
-            x
-            y
-          }
-          ticker
+      getChartData(ticker: "${ticker}") {
+        success
+        message
+        ohlc {
+          x
+          y
         }
-      }`
+        volume {
+          x
+          y
+        }
+        squeeze {
+          x
+          y
+        }
+        ticker
+      }
+    }`
     };
     return this.http.post<any>(this.url, query).pipe(
       map(response => {
