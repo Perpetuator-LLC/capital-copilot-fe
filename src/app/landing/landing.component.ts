@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import {AuthService} from "../auth.service";
 import {CandlestickChartComponent} from "../candlestick-chart/candlestick-chart.component";
 import {ChartControlComponent} from "../chart-control/chart-control.component";
+import * as mockData from './mock-data.json';
 
 @Component({
   selector: 'app-landing',
@@ -20,7 +21,8 @@ import {ChartControlComponent} from "../chart-control/chart-control.component";
   styleUrl: './landing.component.scss'
 })
 export class LandingComponent {
-  dataSource: any = {ticker: ""};
+  // dataSource: any = {ticker: ""};
+  dataSource: any = mockData;
 
   constructor(public authService: AuthService) {}
 

@@ -13,7 +13,7 @@
   </div>
 } @else {
   <div class="chart-box">
-    <div id="chart-candlestick">
+    <div id="chart-candlestick" #chartContainer>
       <apx-chart
         #chartCandlePrice
         [series]="candlePriceOptions.series"
@@ -49,6 +49,17 @@
         [annotations]="squeezeChartOptions.annotations"
       ></apx-chart>
     </div>
+    <div id="brush">
+      <apx-chart
+        #chartScrollbar
+        [series]="scrollbarOptions.series"
+        [chart]="scrollbarOptions.chart"
+        [fill]="scrollbarOptions.fill"
+        [xaxis]="scrollbarOptions.xaxis"
+        [yaxis]="scrollbarOptions.yaxis"
+        [plotOptions]="scrollbarOptions.plotOptions"
+      ></apx-chart>
     <!--  <div>Data: { { dataSource | json }}</div>-->
+    </div>
   </div>
 }
