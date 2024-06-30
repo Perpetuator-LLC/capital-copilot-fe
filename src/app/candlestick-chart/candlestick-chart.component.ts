@@ -19,7 +19,7 @@ import {
   ApexStroke,
   NgApexchartsModule,
   ApexTooltip,
-  ApexAnnotations, ApexFill, ApexNonAxisChartSeries
+  ApexAnnotations, ApexFill, ApexLegend
 } from 'ng-apexcharts';
 import { JsonPipe } from '@angular/common';
 
@@ -34,6 +34,8 @@ export type ChartOptions = {
   stroke: ApexStroke;
   annotations: ApexAnnotations;
   fill: ApexFill;
+  legend: ApexLegend;
+  colors: string[];
 };
 
 @Component({
@@ -47,8 +49,7 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
   private fullStartDate: number | undefined;
   private zoomStartDate: number | undefined;
   private fullEndDate: number | undefined;
-  // private currentZoomStart: number | undefined;
-  // private currentZoomEnd: number | undefined;
+
   @Input() dataSource: any;
   @Output() candleDoubleClicked = new EventEmitter<MouseEvent>();
   @Output() volumeDoubleClicked = new EventEmitter<MouseEvent>();
@@ -57,6 +58,7 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
   @ViewChild('chartBarVolume', { static: false }) barVolumeChart: ChartComponent | undefined
   @ViewChild('chartSqueeze', { static: false }) squeezeChart: ChartComponent | undefined;
   @ViewChild('chartContainer') chartContainer!: ElementRef<HTMLDivElement>;
+
   public scrollbarOptions: ChartOptions;
   public candlePriceOptions: ChartOptions;
   public barVolumeOptions: ChartOptions;
@@ -67,7 +69,7 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
   constructor() {
     this.candlePriceOptions = {
       series: [{ name: 'ohlcSeries', data: [] }],
-      annotations: {}, dataLabels: {}, fill: {}, stroke: {},
+      annotations: {}, dataLabels: {}, fill: {}, stroke: {}, colors: [], legend: {},
       chart: {
         id: 'candleChart', type: 'candlestick', group: 'ticker', height: 480,
         toolbar: { autoSelected: 'pan', show: false, },
@@ -126,7 +128,7 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
 
     this.barVolumeOptions = {
       series: [{ name: 'volumeSeries', data: [] }],
-      annotations: {}, fill: {}, tooltip: {},
+      annotations: {}, fill: {}, tooltip: {}, colors: [], legend: {},
       chart: {
         id: 'volumeChart', type: 'bar', group: 'ticker', height: 160,
         toolbar: { autoSelected: 'zoom', show: false, },
@@ -156,7 +158,8 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
 
     this.squeezeChartOptions = {
       series: [{ name: 'squeezeSeries', data: [] }],
-      annotations: {}, fill: {}, tooltip: {},
+      annotations: {}, fill: {}, tooltip: {}, colors: [],
+      legend: { show: false, },
       chart: {
         id: 'squeezeChart', type: 'bar', group: 'ticker', height: 160,
         toolbar: { autoSelected: 'zoom', show: false, },
@@ -172,18 +175,17 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
             this.handleVolumeClick(event);
           },
         },
+
       },
       dataLabels: { enabled: false, },
       plotOptions: {
         bar: {
+          distributed: true,
           columnWidth: '95%',
-          colors: {
-            ranges: [ { from: -1000, to: 0, color: '#F15B46', }, { from: 1, to: 10000, color: '#FEB019', }, ],
-          },
         },
       },
       stroke: { width: 0, },
-      xaxis: { type: 'datetime', axisBorder: { offsetX: 13, }, },
+      xaxis: { type: 'datetime', },
       yaxis: {
         opposite: true,
         labels: {
@@ -196,7 +198,7 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
 
     this.scrollbarOptions = {
       series: [{ name: 'ohlcSeries', data: [] }],
-      annotations: {}, dataLabels: {}, plotOptions: {}, stroke: {}, tooltip: {},
+      annotations: {}, dataLabels: {}, plotOptions: {}, stroke: {}, tooltip: {}, colors: [], legend: {},
       chart: {
         id: 'scrollbarChart', type: 'area', /*group: 'ticker',*/ height: 100,
         toolbar: { autoSelected: 'selection', show: false, },
@@ -209,7 +211,7 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
       },
       fill: { type: 'gradient', gradient: { opacityFrom: 0.91, opacityTo: 0.5, } },
       xaxis: { type: 'datetime', tooltip: { enabled: false } },
-      yaxis: { tickAmount: 2, opposite: true, labels: { show: false, style: { cssClass: 'fixed-y-axis-label' }, }, },
+      yaxis: { tickAmount: 2, opposite: true, labels: { show: false, }, },
     };
   }
 
@@ -299,7 +301,12 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
   }
 
   updateSqueezeData() {
-    this.squeezeChartOptions.series = [{ name: 'squeezeSeries', data: (this.dataSource['squeeze'] || []) }]
+    const squeezeData = this.dataSource['squeeze'] || [];
+    const squeezeColors = this.determineBarColors(squeezeData);
+    this.squeezeChartOptions.colors = squeezeColors;
+    // this.squeezeChartOptions.xaxis.categories = Array.from({ length: squeezeData.length }, (_, i) => i + 1) // Creating an array of indices
+
+    this.squeezeChartOptions.series = [{ name: 'squeezeSeries', data: squeezeData }]
     if (this.dataSource && this.dataSource['squeeze']) {
       const annotations: ApexAnnotations = {
         points: []
@@ -327,6 +334,29 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
       };
     }
   }
+
+  private determineBarColors(data: {x: string, y: number[]}[]): string[] {
+    let colors = [];
+    for (let i = 0; i < data.length; i++) {
+      const isNegative = (data[i].y[1] < 0);
+      const isIncreasing = (i > 0 && data[i].y[1] > data[i - 1].y[1]);
+      if (isNegative) {
+        if (isIncreasing) {
+          colors.push('#DE0');
+        } else {
+          colors.push('#F00');
+        }
+      } else {
+        if (isIncreasing) {
+          colors.push('#0CC');
+        } else {
+          colors.push('#00F');
+        }
+      }
+    }
+    return colors;
+  }
+
 
   updateScrollbarData() {
     this.scrollbarOptions.series = [{ name: 'ohlcSeries', data: (this.dataSource['ohlc'] || []) }]
