@@ -69,23 +69,14 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
       series: [{ name: 'ohlcSeries', data: [] }],
       annotations: {}, dataLabels: {}, fill: {}, stroke: {},
       chart: {
-        id: 'candleChart', type: 'candlestick', height: 480,
+        id: 'candleChart', type: 'candlestick', group: 'ticker', height: 480,
         toolbar: { autoSelected: 'pan', show: false, },
-        zoom: { enabled: true, },
+        zoom: { enabled: true, type: 'x', autoScaleYaxis: true, },
         animations: { enabled: false, easing: 'easeinout', speed: 80,
           animateGradually: { enabled: true, delay: 10, },
           dynamicAnimation: { enabled: true, speed: 30, }
         },
         events: {
-          // wheel: (chart: any, options?: any) => {
-          //   console.log('Wheel:', options);
-          //
-          // },
-          // scrolled(chart: any, options?: any) {
-          //   if (options?.xaxis?.min && options?.xaxis?.max) {
-          //     console.log('Scrolled:', options.xaxis.min, options.xaxis.max);
-          //   }
-          // },
           click: (event, chartContext, config) => {
             this.handleCandleClick(event);
           },
@@ -113,20 +104,32 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
       },
       plotOptions: {
         bar: { columnWidth: '85%', },
-        candlestick: { colors: { upward: '#3ceb59', downward: '#df4646', }, },
+        candlestick: { colors: { upward: '#0C0', downward: '#D00', }, },
       },
-      xaxis: { type: 'datetime', tickPlacement: 'between', crosshairs: { show: true, }, },
-      yaxis: { opposite: true, labels: { show: true, align: 'left', }, crosshairs: { show: true, }, }
+      xaxis: {
+        type: 'datetime', tickPlacement: 'between',
+        tooltip: { enabled: true, offsetY: 0, },
+        crosshairs: {
+          show: true, width: 1, position: 'front',
+          stroke: { color: '#b6b6b6', width: 1, dashArray: 3 }
+        }
+      },
+      yaxis: {
+        opposite: true, labels: { show: true, align: 'left', },
+        tooltip: { enabled: true, },
+        crosshairs: {
+          show: true, position: 'front',
+          stroke: { color: '#b6b6b6', width: 1, dashArray: 3 }
+        }
+      }
     };
 
     this.barVolumeOptions = {
       series: [{ name: 'volumeSeries', data: [] }],
       annotations: {}, fill: {}, tooltip: {},
       chart: {
-        id: 'volumeChart', type: 'bar', height: 160,
+        id: 'volumeChart', type: 'bar', group: 'ticker', height: 160,
         toolbar: { autoSelected: 'zoom', show: false, },
-        // brush: { enabled: true, targets: ['candles', 'squeeze'], },
-        // selection: { enabled: true, },
         zoom: { enabled: true, },
         animations: { enabled: false, easing: 'easeinout', speed: 80,
           animateGradually: { enabled: true, delay: 10, },
@@ -155,7 +158,7 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
       series: [{ name: 'squeezeSeries', data: [] }],
       annotations: {}, fill: {}, tooltip: {},
       chart: {
-        id: 'squeezeChart', type: 'bar', height: 160,
+        id: 'squeezeChart', type: 'bar', group: 'ticker', height: 160,
         toolbar: { autoSelected: 'zoom', show: false, },
         // brush: { enabled: true, target: 'candles', },
         zoom: { enabled: true, },
@@ -181,14 +184,21 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
       },
       stroke: { width: 0, },
       xaxis: { type: 'datetime', axisBorder: { offsetX: 13, }, },
-      yaxis: { opposite: true, labels: { show: true, align: 'left', }, }
+      yaxis: {
+        opposite: true,
+        labels: {
+          show: true, align: 'left', formatter: function (val: number, opts?: any): string | string[] {
+            return val.toFixed(2);
+          }
+        },
+      }
     };
 
     this.scrollbarOptions = {
       series: [{ name: 'ohlcSeries', data: [] }],
       annotations: {}, dataLabels: {}, plotOptions: {}, stroke: {}, tooltip: {},
       chart: {
-        id: 'scrollbarChart', type: 'area', height: 100,
+        id: 'scrollbarChart', type: 'area', /*group: 'ticker',*/ height: 100,
         toolbar: { autoSelected: 'selection', show: false, },
         brush: { targets: ['candleChart', 'volumeChart', 'squeezeChart'], enabled: true },
         selection: { enabled: true, xaxis: {
@@ -196,20 +206,10 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
           max: 1
           }
         },
-        // events: {
-        //   click: (event, chartContext, config) => {
-        //     this.handleVolumeClick(event);
-        //   },
-        //   selection: (chartContext, { xaxis, yaxis }) => {
-        //     this.currentZoomStart = xaxis.min;
-        //     this.currentZoomEnd = xaxis.max;
-        //     console.log('Current Zoom Range:', this.currentZoomStart, this.currentZoomEnd);
-        //   }
-        // },
       },
       fill: { type: 'gradient', gradient: { opacityFrom: 0.91, opacityTo: 0.5, } },
       xaxis: { type: 'datetime', tooltip: { enabled: false } },
-      yaxis: { tickAmount: 2, opposite: true }
+      yaxis: { tickAmount: 2, opposite: true, labels: { show: false, style: { cssClass: 'fixed-y-axis-label' }, }, },
     };
   }
 
@@ -222,15 +222,6 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
       this.updateSqueezeData();
       this.updateScrollbarData();
       this.resetZoom();
-      // if (this.scrollbarOptions && this.zoomStartDate && this.fullEndDate) {
-      //   this.scrollbarOptions.chart.selection = {
-      //     enabled: true,
-      //     xaxis: {
-      //       min: this.zoomStartDate,
-      //       max: this.fullEndDate
-      //     }
-      //   };
-      // }
     }
   }
 
@@ -260,7 +251,6 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    // this.resetZoom();
     if (this.scrollbarOptions && this.zoomStartDate && this.fullEndDate) {
       this.scrollbarOptions.chart.selection = {
         enabled: true,
@@ -270,76 +260,42 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
         }
       };
     }
+    document.addEventListener('wheel', this.handleScroll.bind(this), { passive: false });
     // this.attachWheelListener();
   }
 
-  // private attachWheelListener() {
-  //   this.chartContainer.nativeElement.addEventListener('wheel', this.handleWheelEvent.bind(this));
-  // }
-  //
-  // handleWheelEvent(event: WheelEvent) {
-  //   event.preventDefault(); // Optionally prevent the default scroll behavior
-  //   const modifier = 100000000;
-  //   const min = this.zoomStartDate;
-  //   const max = this.fullEndDate;
-  //   // const min = this.scrollbarOptions.chart.selection?.xaxis?.min;
-  //   // const max = this.scrollbarOptions.chart.selection?.xaxis?.max;
-  //   console.log('Wheel event deltaY:', event.deltaY, 'Min:', min, 'Max:', max);
-  //   if (min && max) {
-  //     if (event.deltaY > 0) {
-  //       console.log('Scrolling down - Zoom out');
-  //       let proposedMin = min - event.deltaY * modifier;
-  //       if (!this.fullStartDate || proposedMin <= this.fullStartDate) {
-  //         proposedMin = this.fullStartDate || 0;
-  //       }
-  //       this.candlePriceChart?.zoomX(proposedMin, max)
-  //     } else {
-  //       console.log('Scrolling up - Zoom in');
-  //       let proposedMin = min + event.deltaY * modifier;
-  //       if (proposedMin >= (max - 10 * modifier)) {
-  //         proposedMin = max - 10 * modifier;
-  //       }
-  //       this.candlePriceChart?.zoomX(proposedMin, max)
-  //       // if (this.candlePriceChart && this.zoomStartDate && this.fullEndDate) {
-  //       //   this.candlePriceChart.zoomX(this.zoomStartDate, this.fullEndDate);
-  //       // }
-  //     }
-  //   }
-  // }
-  //
+  handleScroll(event: WheelEvent) {
+    event.preventDefault();
+    // @ts-ignore
+    const min = this.candlePriceChart?.chartObj.w.globals.minX;
+    // @ts-ignore
+    const max = this.candlePriceChart?.chartObj.w.globals.maxX;
+
+    var newMinX;
+    if (event.deltaY > 0) { // Zoom In
+      const increment = (max - min) / 2;
+      newMinX = min + increment;
+    } else { // Zoom Out
+      const increment = (max - min);
+      newMinX = min - increment;
+    }
+
+    // Constrain within original chart bounds
+    // @ts-ignore
+    newMinX = Math.max(newMinX, this.candlePriceChart?.chartObj.w.globals.initialMinX);
+
+    // Apply zoom if valid
+    if (!isNaN(newMinX) && newMinX < max) {
+      this.candlePriceChart?.zoomX(newMinX, max);
+    }
+  }
+
   updatePriceData() {
     this.candlePriceOptions.series = [{ name: 'ohlcSeries', data: (this.dataSource['ohlc'] || []) }]
-    // if (this.dataSource && this.dataSource['ohlc']) {
-    //   this.candlePriceOptions = {
-    //     ...this.candlePriceOptions,
-    //     series: [
-    //       {
-    //         name: 'ohlc',
-    //         data: this.dataSource['ohlc'],
-    //       },
-    //     ],
-    //   };
-    // } else {
-    //   this.candlePriceOptions = {
-    //     ...this.candlePriceOptions,
-    //     series: [ ],
-    //   };
-    // }
   }
 
   updateVolumeData() {
     this.barVolumeOptions.series = [{ name: 'volumeSeries', data: (this.dataSource['volume'] || []) }]
-    // if (this.dataSource && this.dataSource['volume']) {
-    //   this.barVolumeOptions = {
-    //     ...this.barVolumeOptions,
-    //     series: [ { name: 'volumeSeries', data: this.dataSource['volume'], }, ],
-    //   };
-    // } else {
-    //   this.barVolumeOptions = {
-    //     ...this.barVolumeOptions,
-    //     series: [ { name: 'volumeSeries', data: [], }, ],
-    //   };
-    // }
   }
 
   updateSqueezeData() {
@@ -368,30 +324,12 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
       this.squeezeChartOptions = {
         ...this.squeezeChartOptions,
         annotations: annotations,
-        // series: [ { name: 'squeezeSeries', data: this.dataSource['squeeze'], }, ],
       };
-    // } else {
-    //   this.squeezeChartOptions = {
-    //     ...this.squeezeChartOptions,
-    //     series: [{ name: 'squeezeSeries', data: [] }],
-    //   };
     }
   }
 
   updateScrollbarData() {
     this.scrollbarOptions.series = [{ name: 'ohlcSeries', data: (this.dataSource['ohlc'] || []) }]
-    // if (this.dataSource && this.dataSource['ohlc']) {
-    //   this.scrollbarOptions = {
-    //     ...this.scrollbarOptions,
-    //     series: [ { name: 'ohlcSeries', data: this.dataSource['ohlc'], }, ],
-    //   };
-    //   this.scrollbarOptions.chart.selection = { xaxis: { min: this.zoomStartDate, max: this.fullEndDate } };
-    // } else {
-    //   this.scrollbarOptions = {
-    //     ...this.scrollbarOptions,
-    //     series: [{ name: 'ohlcSeries', data: [] }],
-    //   };
-    // }
   }
 
   handleCandleClick(event: MouseEvent) {
@@ -405,83 +343,19 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
     if (this.candlePriceChart && this.zoomStartDate && this.fullEndDate) {
       this.candlePriceChart.zoomX(this.zoomStartDate, this.fullEndDate);
     }
-    // if (this.barVolumeChart && this.zoomStartDate && this.fullEndDate) {
-    //   this.barVolumeChart.zoomX(this.zoomStartDate, this.fullEndDate);
-    // }
-    // if (this.squeezeChart && this.zoomStartDate && this.fullEndDate) {
-    //   this.squeezeChart.zoomX(this.zoomStartDate, this.fullEndDate);
-    // }
-
-    // if (this.scrollbarOptions && this.zoomStartDate && this.fullEndDate) {
-    //   this.scrollbarOptions.chart.selection = {
-    //     enabled: true,
-    //     xaxis: {
-    //       min: this.zoomStartDate,
-    //       max: this.fullEndDate
-    //     }
-    //   };
-    // }
-
-    // if (this.scrollbarChart && this.zoomStartDate && this.fullEndDate) {
-    //   this.scrollbarChart.chart.selection = {
-    //     enabled: true,
-    //     xaxis: {
-    //       min: this.zoomStartDate,
-    //       max: this.fullEndDate
-    //     }
-    //   };
-    // }
-
-    // if (this.scrollbarChart && this.zoomStartDate && this.fullEndDate) {
-    //   this.scrollbarChart.toggleDataPointSelection(this.zoomStartDate, this.fullEndDate);
-    //   this.scrollbarChart.updateOptions({
-    //     // chart: {
-    //       selection: {
-    //         xaxis: {
-    //           min: this.zoomStartDate,
-    //           max: this.fullEndDate
-    //         // }
-    //       }
-    //     }
-    //   })
-    // }
   }
 
   handleVolumeClick(event: MouseEvent) {
-    if (event.detail === 2) { // Double click
+    if (event.detail === 2) {
       this.fullZoom();
-      this.volumeDoubleClicked.emit(event);  // Emit the event instead of handling it directly
+      this.volumeDoubleClicked.emit(event);
     }
   }
 
   fullZoom() {
-    // if (this.scrollbarChart && this.zoomStartDate && this.fullEndDate) {
-    //   this.scrollbarChart.chart.selection = {
-    //     enabled: true,
-    //     xaxis: {
-    //       min: this.zoomStartDate,
-    //       max: this.fullEndDate
-    //     }
-    //   };
-    // }
     if (this.candlePriceChart && this.fullStartDate && this.fullEndDate) {
       this.candlePriceChart.zoomX(this.fullStartDate, this.fullEndDate);
     }
-    // if (this.barVolumeChart && this.fullStartDate && this.fullEndDate) {
-    //   this.barVolumeChart.zoomX(this.fullStartDate, this.fullEndDate);
-    // }
-    // if (this.squeezeChart && this.fullStartDate && this.fullEndDate) {
-    //   this.squeezeChart.zoomX(this.fullStartDate, this.fullEndDate);
-    // }
-    // if (this.scrollbarOptions && this.zoomStartDate && this.fullEndDate) {
-    //   this.scrollbarOptions.chart.selection = {
-    //     enabled: true,
-    //     xaxis: {
-    //       min: this.zoomStartDate,
-    //       max: this.fullEndDate
-    //     }
-    //   };
-    // }
   }
 
 }
