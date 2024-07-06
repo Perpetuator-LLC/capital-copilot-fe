@@ -19,11 +19,15 @@ import {
   ApexStroke,
   NgApexchartsModule,
   ApexTooltip,
-  ApexAnnotations, ApexFill, ApexLegend
+  ApexAnnotations,
+  ApexFill,
+  ApexLegend,
+  ApexTitleSubtitle
 } from 'ng-apexcharts';
 import { JsonPipe } from '@angular/common';
 
 export type ChartOptions = {
+  title: ApexTitleSubtitle;
   series: ApexAxisChartSeries;
   chart: ApexChart;
   xaxis: ApexXAxis;
@@ -68,6 +72,7 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
 
   constructor() {
     this.candlePriceOptions = {
+      title: {},
       series: [{ name: 'ohlcSeries', data: [] }],
       annotations: {}, dataLabels: {}, fill: {}, stroke: {}, colors: [], legend: {},
       chart: {
@@ -128,7 +133,7 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
 
     this.barVolumeOptions = {
       series: [{ name: 'volumeSeries', data: [] }],
-      annotations: {}, fill: {}, tooltip: {}, colors: [], legend: {},
+      title:{}, annotations: {}, fill: {}, tooltip: {}, colors: [], legend: {},
       chart: {
         id: 'volumeChart', type: 'bar', group: 'ticker', height: 160,
         toolbar: { autoSelected: 'zoom', show: false, },
@@ -158,7 +163,7 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
 
     this.squeezeChartOptions = {
       series: [{ name: 'squeezeSeries', data: [] }],
-      annotations: {}, fill: {}, tooltip: {}, colors: [],
+      title: {}, annotations: {}, fill: {}, tooltip: {}, colors: [],
       legend: { show: false, },
       chart: {
         id: 'squeezeChart', type: 'bar', group: 'ticker', height: 160,
@@ -198,7 +203,7 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
 
     this.scrollbarOptions = {
       series: [{ name: 'ohlcSeries', data: [] }],
-      annotations: {}, dataLabels: {}, plotOptions: {}, stroke: {}, tooltip: {}, colors: [], legend: {},
+      title: {}, annotations: {}, dataLabels: {}, plotOptions: {}, stroke: {}, tooltip: {}, colors: [], legend: {},
       chart: {
         id: 'scrollbarChart', type: 'area', /*group: 'ticker',*/ height: 100,
         toolbar: { autoSelected: 'selection', show: false, },
@@ -293,7 +298,32 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
   }
 
   updatePriceData() {
-    this.candlePriceOptions.series = [{ name: 'ohlcSeries', data: (this.dataSource['ohlc'] || []) }]
+    const rawData = this.dataSource['kc'];
+    const seriesData: any[][] = Array.from({ length: 9 }, () => []);
+    rawData.forEach((entry: { x: any; y: any[]; }) => {
+      const date = entry.x;
+      entry.y.forEach((value, index) => {
+        if (index !== 4 && index !== 7 && value !== 0) {
+          seriesData[index].push({x: date, y: value});
+        }
+      });
+    });
+    const series = seriesData.map((data, index) => ({
+      name: `Line ${index + 1}`,
+      data: data,
+      color: index === 1 ? '#777' : '#DDD',
+      type: 'line'
+    }));
+
+    this.candlePriceOptions.title = { text: this.dataSource['ticker'], };
+    this.candlePriceOptions.series = [
+      {
+        name: 'ohlcSeries',
+        type: 'candlestick',
+        data: (this.dataSource['ohlc'] || [])
+      },
+      ...series
+    ]
   }
 
   updateVolumeData() {
@@ -359,7 +389,9 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
 
 
   updateScrollbarData() {
-    this.scrollbarOptions.series = [{ name: 'ohlcSeries', data: (this.dataSource['ohlc'] || []) }]
+    this.scrollbarOptions.series = [
+      { name: 'ohlcSeries', data: (this.dataSource['ohlc'] || []) },
+    ]
   }
 
   handleCandleClick(event: MouseEvent) {

@@ -44,19 +44,19 @@ export class ChartControlComponent implements OnDestroy {
 
   onSubmit(): void {
     this.error = null;
+    let ticker = this.stockForm?.value.ticker?.toUpperCase();
     if (this.stockForm) {
-      const ticker = this.stockForm.value.ticker?.toUpperCase();
-      this.stockForm.controls['ticker'].setValue(ticker ? ticker : '');
+      this.stockForm.controls['ticker'].setValue('');
     }
-    this.dataEmitter.emit({ticker: this.stockForm.value.ticker, data: {loading: true}});
-    this.subscription = this.dataService.fetchData(this.stockForm.value.ticker).subscribe({
+    this.dataEmitter.emit({ticker: ticker, data: {loading: true}});
+    this.subscription = this.dataService.fetchData(ticker).subscribe({
       next: (data) => {
         this.dataEmitter.emit(data);
       },
       error: (err) => {
         // TODO: Decide which of these 2 to use:
         this.error = err.message;
-        this.dataEmitter.emit({ ticker: this.stockForm.value.ticker, data: { error: err.message } });
+        this.dataEmitter.emit({ ticker: ticker, data: { error: err.message } });
       },
       complete: () => {
         console.log('Data fetch complete');

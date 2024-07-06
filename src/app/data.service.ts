@@ -32,6 +32,10 @@ export class DataService {
           x
           y
         }
+        kc {
+          x
+          y
+        }
         ticker
       }
     }`
