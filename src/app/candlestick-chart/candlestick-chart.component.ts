@@ -273,7 +273,6 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
       };
     }
     document.addEventListener('wheel', this.handleScroll.bind(this), { passive: false });
-    // this.attachWheelListener();
   }
 
   handleScroll(event: WheelEvent) {

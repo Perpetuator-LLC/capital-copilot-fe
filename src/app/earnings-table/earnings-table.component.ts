@@ -1,13 +1,8 @@
-import {
-  Component,
-  Input,
-  OnChanges,
-  SimpleChanges,
-} from '@angular/core';
-import {DatePipe, JsonPipe} from '@angular/common';
-import {MatTableModule} from "@angular/material/table";
-import {MatAccordion, MatExpansionModule, MatExpansionPanel, MatExpansionPanelTitle} from "@angular/material/expansion";
-import {MatTooltipModule} from "@angular/material/tooltip";
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { MatTableModule } from '@angular/material/table';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatExpansionModule } from '@angular/material/expansion';
+import {CommonModule, DatePipe} from '@angular/common';
 
 export interface EarningsData {
   symbol: string;
@@ -20,23 +15,25 @@ export interface EarningsData {
 }
 
 @Component({
-  imports: [JsonPipe, MatTableModule, DatePipe, MatAccordion, MatExpansionPanel, MatExpansionPanelTitle,
-    MatExpansionModule, MatTooltipModule],
-
   selector: 'earnings-table',
-  standalone: true,
-  styleUrls: ['./earnings-table.component.scss'],
   templateUrl: './earnings-table.component.html',
+  styleUrls: ['./earnings-table.component.scss'],
+  standalone: true,
+  providers: [DatePipe],
+  imports: [
+    MatTableModule,
+    MatTooltipModule,
+    MatExpansionModule,
+    CommonModule
+  ],
 })
-
 export class EarningsTableComponent implements OnChanges {
   @Input() dataSource: any;
 
   displayedColumns: string[] = ['symbol', 'name', 'reportDate', 'fiscalDateEnding', 'estimate', 'currency', 'daysFromNow'];
   earningsData: EarningsData[] = [];
 
-  constructor() {
-  }
+  constructor(private datePipe: DatePipe) {}
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['dataSource']) {
@@ -46,21 +43,19 @@ export class EarningsTableComponent implements OnChanges {
   }
 
   updateEarnings() {
-    const rawData = this.dataSource['earnings'];
+    const rawData = this.dataSource['earnings']; // <-- comes in here
     const currentDate = new Date();
 
     this.earningsData = rawData.map((item: any) => {
       const reportDate = new Date(item.reportDate);
       const fiscalDateEnding = new Date(item.fiscalDateEnding);
       const daysFromNow = Math.floor((reportDate.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24));
-      const color = daysFromNow < 30 ? 'red' : (daysFromNow < 60 ? 'yellow' : 'green');
 
       return {
         ...item,
         reportDate,
         fiscalDateEnding,
-        daysFromNow,
-        color
+        daysFromNow
       };
     });
   }

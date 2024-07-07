@@ -12,11 +12,13 @@ https://github.com/apexcharts/ng-apexcharts/pull/332
 
 For now, we are installing with:
 ```shell
+yarn add apexcharts ng-apexcharts ?
 npm install apexcharts ng-apexcharts --legacy-peer-deps
 ```
 
 Once they merge, then we can upgrade and not use legacy:
 ```shell
+yarn ...
 npm update ng-apexcharts
 ```
 
@@ -40,5 +42,6 @@ imports: [
 
 If we decide we want to downgrade Angular to 17:
 ```shell
+yarn...
 npm install @angular/common@17 @angular/core@17 --save
 ```

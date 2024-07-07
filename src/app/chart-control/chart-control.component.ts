@@ -71,9 +71,6 @@ export class ChartControlComponent implements OnDestroy, AfterViewInit {
   }
 
   private focusInput() {
-    // now focus the stockForm controls input element
-    // this.stockForm.controls['ticker'].setValue(ticker);
-    // now focus our input
     const input = document.querySelector<HTMLInputElement>('#ticker');
     if (input) {
       input.focus();

@@ -5,11 +5,13 @@ import {ChartControlComponent} from "../chart-control/chart-control.component";
 import * as mockData from './mock-data.json';
 // import dataSource from "./mock-data.json";
 import {EarningsTableComponent} from "../earnings-table/earnings-table.component";
+import {MatButton} from "@angular/material/button";
+import {MatBadge} from "@angular/material/badge";
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [ChartControlComponent, CandlestickChartComponent, EarningsTableComponent],
+  imports: [ChartControlComponent, CandlestickChartComponent, EarningsTableComponent, MatButton, MatBadge],
   template: `
     <h1>Welcome to Capital Copilot!</h1>
     @if (authService.isLoggedIn()) {
