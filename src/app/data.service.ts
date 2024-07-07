@@ -36,6 +36,14 @@ export class DataService {
           x
           y
         }
+        earnings {
+          symbol
+          name
+          reportDate
+          fiscalDateEnding
+          estimate
+          currency
+        }
         ticker
       }
     }`

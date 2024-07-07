@@ -1,0 +1,22 @@
+table {
+  width: 100%;
+}
+
+.mat-column-symbol {
+  width: 20%;
+}
+
+.mat-header-cell {
+  display: none;
+}
+
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  p {
+    font-size: 1.2em;
+    color: #333;
+  }
+}

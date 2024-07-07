@@ -122,7 +122,12 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
         }
       },
       yaxis: {
-        opposite: true, labels: { show: true, align: 'left', },
+        opposite: true,
+        labels: {
+          show: true, align: 'left', formatter: function (val: number, opts?: any): string | string[] {
+            return val.toFixed(2);
+          }
+        },
         tooltip: { enabled: true, },
         crosshairs: {
           show: true, position: 'front',
@@ -272,6 +277,7 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
   }
 
   handleScroll(event: WheelEvent) {
+    if (!event.ctrlKey) return; // abort if CTRL not pressed...
     event.preventDefault();
     // @ts-ignore
     const min = this.candlePriceChart?.chartObj.w.globals.minX;
@@ -279,7 +285,7 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
     const max = this.candlePriceChart?.chartObj.w.globals.maxX;
 
     var newMinX;
-    if (event.deltaY > 0) { // Zoom In
+    if (event.deltaY < 0) { // Zoom In
       const increment = (max - min) / 2;
       newMinX = min + increment;
     } else { // Zoom Out
@@ -346,13 +352,13 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
         if (data.y[0] === 0) { // Assuming '1' indicates Squeeze On
           annotations.points?.push({
             x: new Date(data.x).getTime(), y: 0,
-            marker: { size: 2, fillColor: '#0C0', shape: 'circle', strokeWidth: 0, },
+            marker: { size: 3, fillColor: '#0C0', shape: 'circle', strokeWidth: 0, },
             // label: { borderColor: '#00FF00', text: 'On' }
           });
         } else if (data.y[0] === 1) { // Assuming '0' indicates Squeeze Off
           annotations.points?.push({
             x: new Date(data.x).getTime(), y: 0,
-            marker: { size: 2, fillColor: '#F00', shape: 'circle', strokeWidth: 0, },
+            marker: { size: 3, fillColor: '#F00', shape: 'circle', strokeWidth: 0, },
             // label: { borderColor: '#FF0000', text: 'Off' }
           });
         }

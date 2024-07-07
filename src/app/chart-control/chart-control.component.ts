@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component, EventEmitter, OnDestroy, Output,
 } from '@angular/core';
 import {DataService} from "../data.service";
@@ -17,7 +18,7 @@ import {Subscription} from "rxjs";
     <form [formGroup]="stockForm" (ngSubmit)="onSubmit()">
       <label for="ticker">
         Ticker:
-        <input type="text" formControlName="ticker" />
+        <input type="text" formControlName="ticker" id="ticker"/>
       </label>
       <button type="submit" [disabled]="!stockForm.valid">Go!</button>
     </form>
@@ -30,7 +31,7 @@ import {Subscription} from "rxjs";
   styleUrl: './chart-control.component.scss',
 })
 
-export class ChartControlComponent implements OnDestroy {
+export class ChartControlComponent implements OnDestroy, AfterViewInit {
   stockForm = new FormGroup({
     ticker: new FormControl('', Validators.required),
   })
@@ -41,6 +42,10 @@ export class ChartControlComponent implements OnDestroy {
   constructor(
     private dataService: DataService
   ) {}
+
+  ngAfterViewInit(): void {
+        this.focusInput();
+    }
 
   onSubmit(): void {
     this.error = null;
@@ -60,8 +65,19 @@ export class ChartControlComponent implements OnDestroy {
       },
       complete: () => {
         console.log('Data fetch complete');
+        this.focusInput();
       }
     });
+  }
+
+  private focusInput() {
+    // now focus the stockForm controls input element
+    // this.stockForm.controls['ticker'].setValue(ticker);
+    // now focus our input
+    const input = document.querySelector<HTMLInputElement>('#ticker');
+    if (input) {
+      input.focus();
+    }
   }
 
   ngOnDestroy() {
