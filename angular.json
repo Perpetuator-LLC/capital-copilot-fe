@@ -32,7 +32,13 @@
               }
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles-new.scss",
+              "src/assets/styles/dark.css",
+              "src/assets/styles/dark-mc.css",
+              "src/assets/styles/dark-hc.css",
+              "src/assets/styles/light.css",
+              "src/assets/styles/light-mc.css",
+              "src/assets/styles/light-hc.css"
             ],
             "scripts": [
               "node_modules/apexcharts/dist/apexcharts.min.js"

@@ -2,7 +2,8 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatExpansionModule } from '@angular/material/expansion';
-import {CommonModule, DatePipe} from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 export interface EarningsData {
   symbol: string;
@@ -12,6 +13,7 @@ export interface EarningsData {
   estimate: number | null;
   currency: string;
   daysFromNow: number;
+  color: string;
 }
 
 @Component({
@@ -24,13 +26,14 @@ export interface EarningsData {
     MatTableModule,
     MatTooltipModule,
     MatExpansionModule,
-    CommonModule
+    CommonModule,
+    MatProgressSpinnerModule
   ],
 })
 export class EarningsTableComponent implements OnChanges {
   @Input() dataSource: any;
 
-  displayedColumns: string[] = ['symbol', 'name', 'reportDate', 'fiscalDateEnding', 'estimate', 'currency', 'daysFromNow'];
+  displayedColumns: string[] = ['daysFromNow', 'reportDate', 'estimate'];
   earningsData: EarningsData[] = [];
 
   constructor(private datePipe: DatePipe) {}
@@ -43,19 +46,21 @@ export class EarningsTableComponent implements OnChanges {
   }
 
   updateEarnings() {
-    const rawData = this.dataSource['earnings']; // <-- comes in here
+    const rawData = this.dataSource['earnings'];
     const currentDate = new Date();
 
-    this.earningsData = rawData.map((item: any) => {
+    this.earningsData = rawData?.map((item: any) => {
       const reportDate = new Date(item.reportDate);
       const fiscalDateEnding = new Date(item.fiscalDateEnding);
       const daysFromNow = Math.floor((reportDate.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24));
+      const color = daysFromNow < 15 ? 'red' : (daysFromNow < 30 ? 'orange' : (daysFromNow < 45 ? 'yellow' : 'green'));
 
       return {
         ...item,
         reportDate,
         fiscalDateEnding,
-        daysFromNow
+        daysFromNow,
+        color
       };
     });
   }

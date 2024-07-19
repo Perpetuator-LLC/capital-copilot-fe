@@ -22,7 +22,7 @@ import {
   ApexAnnotations,
   ApexFill,
   ApexLegend,
-  ApexTitleSubtitle
+  ApexTitleSubtitle, ApexGrid
 } from 'ng-apexcharts';
 import { JsonPipe } from '@angular/common';
 
@@ -39,6 +39,7 @@ export type ChartOptions = {
   annotations: ApexAnnotations;
   fill: ApexFill;
   legend: ApexLegend;
+  grid: ApexGrid;
   colors: string[];
 };
 
@@ -74,7 +75,7 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
     this.candlePriceOptions = {
       title: {},
       series: [{ name: 'ohlcSeries', data: [] }],
-      annotations: {}, dataLabels: {}, fill: {}, stroke: {}, colors: [], legend: {},
+      annotations: {}, dataLabels: {}, fill: {}, stroke: {}, colors: [], legend: { show: false }, grid: {},
       chart: {
         id: 'candleChart', type: 'candlestick', group: 'ticker', height: 480,
         toolbar: { autoSelected: 'pan', show: false, },
@@ -93,20 +94,28 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
         enabled: true, followCursor: false,
         fixed: { enabled: true, position: 'topLeft', offsetX: 50, },
         custom: function ({series, seriesIndex, dataPointIndex, w}) {
-          const o = w.globals.seriesCandleO[seriesIndex][dataPointIndex];
-          const h = w.globals.seriesCandleH[seriesIndex][dataPointIndex];
-          const l = w.globals.seriesCandleL[seriesIndex][dataPointIndex];
-          const c = w.globals.seriesCandleC[seriesIndex][dataPointIndex];
-          return (
-            '<div class="apexcharts-tooltip-candlestick">' +
+          if (w.globals.seriesNames[seriesIndex] === "ohlcSeries") {
+            const o = w.globals.seriesCandleO[seriesIndex][dataPointIndex];
+            const h = w.globals.seriesCandleH[seriesIndex][dataPointIndex];
+            const l = w.globals.seriesCandleL[seriesIndex][dataPointIndex];
+            const c = w.globals.seriesCandleC[seriesIndex][dataPointIndex];
+            return (
+              '<div class="apexcharts-tooltip-candlestick">' +
+              '<mat-grid-list cols="4" rowHeight="100px">' +
+                '<mat-grid-tile colspan="1" rowspan="1">Open: ' + o + '</mat-grid-tile>' +
+                '<mat-grid-tile colspan="1" rowspan="1">High: ' + h + '</mat-grid-tile>' +
+                '<mat-grid-tile colspan="1" rowspan="1">Low: ' + l + '</mat-grid-tile>' +
+                '<mat-grid-tile colspan="1" rowspan="1">Close: ' + c + '</mat-grid-tile>' +
+              '</mat-grid-list>' +
+              '</div>'
+            );
+          } else {
+            return ('<div class="apexcharts-tooltip-candlestick">' +
             '<pre>' +
-            '<span>Open: ' + o + '</span> | ' +
-            '<span>High: ' + h + '</span> | ' +
-            '<span>Low: ' + l + '</span> | ' +
-            '<span>Close: ' + c + '</span>' +
+            '<span>' + w.globals.seriesNames[seriesIndex] + ': ' + series[seriesIndex][dataPointIndex] + '</span>' +
             '</pre>' +
-            '</div>'
-          );
+            '</div>');
+          }
         },
       },
       plotOptions: {
@@ -138,7 +147,7 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
 
     this.barVolumeOptions = {
       series: [{ name: 'volumeSeries', data: [] }],
-      title:{}, annotations: {}, fill: {}, tooltip: {}, colors: [], legend: {},
+      title:{}, annotations: {}, fill: {}, tooltip: {}, colors: [], legend: {}, grid: {},
       chart: {
         id: 'volumeChart', type: 'bar', group: 'ticker', height: 160,
         toolbar: { autoSelected: 'zoom', show: false, },
@@ -168,7 +177,7 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
 
     this.squeezeChartOptions = {
       series: [{ name: 'squeezeSeries', data: [] }],
-      title: {}, annotations: {}, fill: {}, tooltip: {}, colors: [],
+      title: {}, annotations: {}, fill: {}, tooltip: {}, colors: [], grid: {},
       legend: { show: false, },
       chart: {
         id: 'squeezeChart', type: 'bar', group: 'ticker', height: 160,
@@ -209,13 +218,34 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
     this.scrollbarOptions = {
       series: [{ name: 'ohlcSeries', data: [] }],
       title: {}, annotations: {}, dataLabels: {}, plotOptions: {}, stroke: {}, tooltip: {}, colors: [], legend: {},
+      grid: { show: false, },
       chart: {
-        id: 'scrollbarChart', type: 'area', /*group: 'ticker',*/ height: 100,
+        id: 'scrollbarChart', type: 'area', /*group: 'ticker',*/ height: 85,
         toolbar: { autoSelected: 'selection', show: false, },
-        brush: { targets: ['candleChart', 'volumeChart', 'squeezeChart'], enabled: true },
-        selection: { enabled: true, xaxis: {
-          min: 0,
-          max: 1
+        brush: {
+          enabled: true,
+          targets: ['candleChart', 'volumeChart', 'squeezeChart'],
+        },
+        selection: {
+          enabled: true,
+          type: 'x',
+          fill: {
+            color: '#FFF',
+            opacity: 0.9
+          },
+          stroke: {
+            width: 3,
+            dashArray: 3,
+            color: '#FFF',
+            opacity: 0.9
+          },
+          xaxis: {
+            min: undefined,
+            max: undefined
+          },
+          yaxis: {
+            min: undefined,
+            max: undefined
           }
         },
       },
@@ -305,20 +335,60 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
   updatePriceData() {
     const rawData = this.dataSource['kc'];
     const seriesData: any[][] = Array.from({ length: 9 }, () => []);
-    rawData.forEach((entry: { x: any; y: any[]; }) => {
+    rawData?.forEach((entry: { x: any; y: any[]; }) => {
       const date = entry.x;
       entry.y.forEach((value, index) => {
-        if (index !== 4 && index !== 7 && value !== 0) {
+        if (value !== 0) {
           seriesData[index].push({x: date, y: value});
         }
       });
     });
-    const series = seriesData.map((data, index) => ({
-      name: `Line ${index + 1}`,
-      data: data,
-      color: index === 1 ? '#777' : '#DDD',
-      type: 'line'
-    }));
+    const series = seriesData.map((data, index) => {
+      const dark = true;
+      const color = (dark ? (index === 1 ? '#777' : '#444') : (index === 1 ? '#777' : '#DDD'));
+      const element = {
+        name: `Line ${index + 1}`,
+        data,
+        color: color,
+        type: 'line'
+      }
+      switch(index) {
+        case 0:
+          element["name"]='KC 20 EMA -1 ATR';
+          break;
+        case 1:
+          element["name"]='KC 20 EMA 0 ATR';
+          break;
+        case 2:
+          element["name"]='KC 20 EMA +1 ATR';
+          break;
+        case 3:
+          element["name"]='KC 20 EMA -2 ATR';
+          break;
+        case 4:
+          element["name"]='KC 20 EMA 0 ATR';
+          break;
+        case 5:
+          element["name"]='KC 20 EMA +2 ATR';
+          break;
+        case 6:
+          element["name"]='KC 20 EMA -3 ATR';
+          break;
+        case 7:
+          element["name"]='KC 20 EMA 0 ATR';
+          break
+        case 8:
+          element["name"]='KC 20 EMA +3 ATR';
+          break;
+        default:
+          break;
+      }
+      return element;
+    });
+
+    // Remove the duplicate series (20 EMA 0 ATR), order here matters else the wrong series will be removed
+    series.splice(7, 1);
+    series.splice(4, 1);
 
     this.candlePriceOptions.title = { text: this.dataSource['ticker'], };
     this.candlePriceOptions.series = [
@@ -377,6 +447,7 @@ export class CandlestickChartComponent implements OnChanges, AfterViewInit {
       const isIncreasing = (i > 0 && data[i].y[1] > data[i - 1].y[1]);
       if (isNegative) {
         if (isIncreasing) {
+          // colors: [getComputedStyle(document.documentElement).getPropertyValue('--chart-positive')]
           colors.push('#DE0');
         } else {
           colors.push('#F00');

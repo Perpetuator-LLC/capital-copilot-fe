@@ -13,7 +13,6 @@ import {MatBadge} from "@angular/material/badge";
   standalone: true,
   imports: [ChartControlComponent, CandlestickChartComponent, EarningsTableComponent, MatButton, MatBadge],
   template: `
-    <h1>Welcome to Capital Copilot!</h1>
     @if (authService.isLoggedIn()) {
       <chart-control (dataEmitter)="handleData($event)"></chart-control>
       <earnings-table [dataSource]="dataSource"></earnings-table>
