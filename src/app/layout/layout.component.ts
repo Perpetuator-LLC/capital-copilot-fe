@@ -21,7 +21,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-layout',
   templateUrl: './layout.component.html',
-  styleUrl: './layout.component.scss',
+  styleUrls: ['./layout.component.scss'],
   standalone: true,
   imports: [
     MatToolbarModule,

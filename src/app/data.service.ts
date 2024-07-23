@@ -14,22 +14,6 @@ export interface ChartData {
   earnings?: EarningsData[];
   ticker?: string;
 }
-// export interface ChartData {
-//   ticker?: string;
-//   ohlc?: OHLC[];
-//   volume?: Volume[];
-//   kc?: KeltnerChannel[];
-//   squeeze?: Squueze[];
-//   earnings?: {
-//     symbol: string;
-//     name: string;
-//     reportDate: string;
-//     fiscalDateEnding: string;
-//     estimate: number;
-//     currency: string;
-//   }[];
-//   data?: { loading: boolean; error: string };
-// }
 
 export interface OHLC {
   x: number | string;

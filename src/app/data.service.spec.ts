@@ -1,5 +1,8 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
 import { DataService } from './data.service';
 
 describe('DataService', () => {
@@ -9,7 +12,7 @@ describe('DataService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [DataService]
+      providers: [DataService],
     });
     service = TestBed.inject(DataService);
     httpMock = TestBed.inject(HttpTestingController);
@@ -25,9 +28,9 @@ describe('DataService', () => {
 
   it('should fetch data', () => {
     const mockTicker = 'AAPL';
-    const mockResponse = { data: 'mock data' };
+    const mockResponse = { ticker: mockTicker };
 
-    service.fetchData(mockTicker).subscribe(response => {
+    service.fetchData(mockTicker).subscribe((response) => {
       expect(response).toEqual(mockResponse);
     });
 

@@ -5,7 +5,7 @@ import {
   OnDestroy,
   Output,
 } from '@angular/core';
-import { ChartData, ChartDataResponse, DataService } from '../../data.service';
+import { ChartData, DataService } from '../../data.service';
 import {
   FormControl,
   FormGroup,

@@ -1,1 +1,9 @@
-<p>landing works!</p>
+@if (authService.isLoggedIn()) {
+  <app-chart-control (dataEmitter)="handleData($event)"></app-chart-control>
+  <app-chart-earnings-table
+    [dataSource]="dataSource"
+  ></app-chart-earnings-table>
+  <app-chart-candlestick [dataSource]="dataSource"></app-chart-candlestick>
+} @else {
+  <p>Please login to use the app.</p>
+}
