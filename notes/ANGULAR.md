@@ -6,8 +6,8 @@ To generate new components:
 $ ng generate component chart
 CREATE src/app/chart/chart.component.scss (0 bytes)
 CREATE src/app/chart/chart.component.html (20 bytes)
-CREATE src/app/chart/chart-control.component.spec.ts (589 bytes)
-CREATE src/app/chart/chart-control.component.ts (231 bytes)
+CREATE src/app/chart/control.component.spec.ts (589 bytes)
+CREATE src/app/chart/control.component.ts (231 bytes)
 ```
 
 To generate new services:

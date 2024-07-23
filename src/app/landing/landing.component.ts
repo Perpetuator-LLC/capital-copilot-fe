@@ -1,37 +1,45 @@
 import { Component } from '@angular/core';
-import {AuthService} from "../auth.service";
-import {CandlestickChartComponent} from "../candlestick-chart/candlestick-chart.component";
-import {ChartControlComponent} from "../chart-control/chart-control.component";
+import { AuthService } from '../auth.service';
 import * as mockData from './mock-data.json';
 // import dataSource from "./mock-data.json";
-import {EarningsTableComponent} from "../earnings-table/earnings-table.component";
-import {MatButton} from "@angular/material/button";
-import {MatBadge} from "@angular/material/badge";
+import { MatButton } from '@angular/material/button';
+import { MatBadge } from '@angular/material/badge';
+import { ChartData } from '../data.service';
+import { ControlComponent } from '../chart/control/control.component';
+import { EarningsTableComponent } from '../chart/earnings-table/earnings-table.component';
+import { CandlestickComponent } from '../chart/candlestick/candlestick.component';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [ChartControlComponent, CandlestickChartComponent, EarningsTableComponent, MatButton, MatBadge],
+  imports: [
+    ControlComponent,
+    CandlestickComponent,
+    EarningsTableComponent,
+    MatButton,
+    MatBadge,
+  ],
   template: `
     @if (authService.isLoggedIn()) {
-      <chart-control (dataEmitter)="handleData($event)"></chart-control>
-      <earnings-table [dataSource]="dataSource"></earnings-table>
-      <candlestick-chart [dataSource]="dataSource"></candlestick-chart>
+      <app-chart-control (dataEmitter)="handleData($event)"></app-chart-control>
+      <app-chart-earnings-table
+        [dataSource]="dataSource"
+      ></app-chart-earnings-table>
+      <app-chart-candlestick [dataSource]="dataSource"></app-chart-candlestick>
     } @else {
       <p>Please login to use the app.</p>
     }
   `,
   // templateUrl: './landing.component.html',
-  styleUrl: './landing.component.scss'
+  styleUrl: './landing.component.scss',
 })
 export class LandingComponent {
   // dataSource: any = {ticker: ""};
-  dataSource: any = mockData;
+  dataSource: ChartData = mockData;
 
   constructor(public authService: AuthService) {}
 
-  handleData(data: any) {
+  handleData(data: ChartData) {
     this.dataSource = data;
   }
 }
-

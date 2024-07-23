@@ -1,4 +1,27 @@
+# Angular Material Icons
+
+- https://fonts.google.com/icons
+
+# Angular Material Schematics to Generate Components
+
+See:
+- https://material.angular.io/guide/schematics
+
+Here are some examples of how to generate Angular Material components:
+```shell
+ng generate @angular/material:navigation layout
+ng generate @angular/material:dashboard dashboard
+ng generate @angular/material:address-form address-form
+ng generate @angular/material:table table
+ng generate @angular/material:tree tree
+ng generate @angular/cdk:drag-drop drag-drop
+```
+
 # Angular Material Custom Theme
+
+See:
+- https://github.com/angular/components/blob/main/guides/theming.md
+- https://angular-material.dev/articles/angular-material-3
 
 ```shell
 $  ng generate @angular/material:m3-theme
@@ -41,6 +64,9 @@ Exported to: `notes/invest-theme.json`
 Also see: http://material-foundation.github.io?primary=%230F0096&secondary=%235900D0&tertiary=%23EE6200&neutral=%23424245&neutralVariant=%236D6C76&custom%3ACustom+Color+1=%23008F47&custom%3ACustom+Color+2=%2393000E&bodyFont=Ubuntu&displayFont=Gilda+Display&colorMatch=true
 
 The CSS files in `src/assets` were generated from this tool. The JSON file is used to import the colors back into that tool to make modifications.
+
+Can also try the themes and see styling here:
+- https://themes.angular-material.dev/
 
 # Angular Material Install
 

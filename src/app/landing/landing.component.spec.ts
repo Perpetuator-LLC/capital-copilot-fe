@@ -1,11 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LandingComponent } from './landing.component';
 import { AuthService } from '../auth.service';
-import { ChartComponent } from '../chart/chart.component';
-import { CandlestickGraphComponent } from '../candlestick-graph/candlestick-graph.component';
 import { By } from '@angular/platform-browser';
-import { of } from 'rxjs';
-import {HttpClientTestingModule} from "@angular/common/http/testing";
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ChartComponent } from 'ng-apexcharts';
+import { CandlestickComponent } from '../chart/candlestick/candlestick.component';
 
 describe('LandingComponent', () => {
   let component: LandingComponent;
@@ -16,10 +15,14 @@ describe('LandingComponent', () => {
     const authServiceSpy = jasmine.createSpyObj('AuthService', ['isLoggedIn']);
 
     await TestBed.configureTestingModule({
-      imports: [ChartComponent, CandlestickGraphComponent, LandingComponent, HttpClientTestingModule],
-      providers: [{ provide: AuthService, useValue: authServiceSpy }]
-    })
-      .compileComponents();
+      imports: [
+        ChartComponent,
+        CandlestickComponent,
+        LandingComponent,
+        HttpClientTestingModule,
+      ],
+      providers: [{ provide: AuthService, useValue: authServiceSpy }],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(LandingComponent);
     component = fixture.componentInstance;
@@ -43,8 +46,12 @@ describe('LandingComponent', () => {
     authService.isLoggedIn.and.returnValue(true);
     fixture.detectChanges();
 
-    const chartComponent = fixture.debugElement.query(By.directive(ChartComponent));
-    const candlestickGraphComponent = fixture.debugElement.query(By.directive(CandlestickGraphComponent));
+    const chartComponent = fixture.debugElement.query(
+      By.directive(ChartComponent),
+    );
+    const candlestickGraphComponent = fixture.debugElement.query(
+      By.directive(CandlestickComponent),
+    );
 
     expect(chartComponent).toBeTruthy();
     expect(candlestickGraphComponent).toBeTruthy();
@@ -54,8 +61,10 @@ describe('LandingComponent', () => {
     authService.isLoggedIn.and.returnValue(true);
     fixture.detectChanges();
 
-    const chartComponent = fixture.debugElement.query(By.directive(ChartComponent));
-    const testData = { key: 'value' };
+    const chartComponent = fixture.debugElement.query(
+      By.directive(ChartComponent),
+    );
+    const testData = { ticker: 'value' };
 
     chartComponent.triggerEventHandler('dataEmitter', testData);
     fixture.detectChanges();
@@ -68,8 +77,10 @@ describe('LandingComponent', () => {
     authService.isLoggedIn.and.returnValue(true);
     fixture.detectChanges();
 
-    const chartComponent = fixture.debugElement.query(By.directive(ChartComponent));
-    const testData = { key: 'value' };
+    const chartComponent = fixture.debugElement.query(
+      By.directive(ChartComponent),
+    );
+    const testData = { ticker: 'value' };
 
     chartComponent.triggerEventHandler('dataEmitter', testData);
     fixture.detectChanges();

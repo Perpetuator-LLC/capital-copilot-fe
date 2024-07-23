@@ -1,36 +1,35 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { EarningsTableComponent } from './earnings-table.component';
+import { CandlestickComponent, ChartData } from './candlestick.component';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { JsonPipe } from '@angular/common';
-import {By} from "@angular/platform-browser";
 
 describe('CandlestickGraphComponent', () => {
-  let component: EarningsTableComponent;
-  let fixture: ComponentFixture<EarningsTableComponent>;
-  let dataSource: any;
+  let component: CandlestickComponent;
+  let fixture: ComponentFixture<CandlestickComponent>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let dataSource: { ohlc: any; volume: any };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [NgApexchartsModule, JsonPipe, EarningsTableComponent]
+      imports: [NgApexchartsModule, JsonPipe, CandlestickComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(EarningsTableComponent);
+    fixture = TestBed.createComponent(CandlestickComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
 
     dataSource = {
       ohlc: [
         { x: new Date('2023-01-01').getTime(), y: [1, 2, 3, 4] },
-        { x: new Date('2023-01-02').getTime(), y: [2, 3, 4, 5] }
+        { x: new Date('2023-01-02').getTime(), y: [2, 3, 4, 5] },
       ],
       volume: [
         { x: new Date('2023-01-01').getTime(), y: 1000 },
-        { x: new Date('2023-01-02').getTime(), y: 2000 }
-      ]
+        { x: new Date('2023-01-02').getTime(), y: 2000 },
+      ],
     };
 
     component.dataSource = dataSource;
-
   });
 
   it('should create', () => {
@@ -38,32 +37,35 @@ describe('CandlestickGraphComponent', () => {
   });
 
   it('should update chart options when dataSource changes', () => {
-
     component.ngOnChanges({
       dataSource: {
         currentValue: dataSource,
         previousValue: undefined,
         firstChange: true,
         isFirstChange: () => true,
-      }
+      },
     });
 
     expect(component.candlePriceOptions.series.length).toBe(1);
-    expect(component.candlePriceOptions.series[0].data).toEqual(dataSource.ohlc);
+    expect(component.candlePriceOptions.series[0].data).toEqual(
+      dataSource.ohlc,
+    );
     expect(component.barVolumeOptions.series.length).toBe(1);
-    expect(component.barVolumeOptions.series[0].data).toEqual(dataSource.volume);
+    expect(component.barVolumeOptions.series[0].data).toEqual(
+      dataSource.volume,
+    );
   });
 
   it('should set date range correctly', () => {
-    const dataSource = {
+    const dataSource: ChartData = {
       ohlc: [
         { x: new Date('2023-01-01').getTime(), y: [1, 2, 3, 4] },
-        { x: new Date('2023-01-02').getTime(), y: [2, 3, 4, 5] }
+        { x: new Date('2023-01-02').getTime(), y: [2, 3, 4, 5] },
       ],
       volume: [
         { x: new Date('2023-01-01').getTime(), y: 1000 },
-        { x: new Date('2023-01-02').getTime(), y: 2000 }
-      ]
+        { x: new Date('2023-01-02').getTime(), y: 2000 },
+      ],
     };
 
     component.dataSource = dataSource;
@@ -97,7 +99,6 @@ describe('CandlestickGraphComponent', () => {
     const event = new MouseEvent('click', { detail: 2 });
     if (component.candlePriceOptions.chart?.events?.click) {
       component.candlePriceOptions.chart.events.click(event, {}, {});
-
     }
     expect(component.resetZoom).toHaveBeenCalled();
   });
@@ -107,7 +108,6 @@ describe('CandlestickGraphComponent', () => {
     const event = new MouseEvent('click', { detail: 2 });
     if (component.barVolumeOptions.chart?.events?.click) {
       component.barVolumeOptions.chart.events.click(event, {}, {});
-
     }
     expect(component.fullZoom).toHaveBeenCalled();
   });

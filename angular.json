@@ -32,13 +32,7 @@
               }
             ],
             "styles": [
-              "src/styles-new.scss",
-              "src/assets/styles/dark.css",
-              "src/assets/styles/dark-mc.css",
-              "src/assets/styles/dark-hc.css",
-              "src/assets/styles/light.css",
-              "src/assets/styles/light-mc.css",
-              "src/assets/styles/light-hc.css"
+              "src/styles.scss"
             ],
             "scripts": [
               "node_modules/apexcharts/dist/apexcharts.min.js"
@@ -104,8 +98,22 @@
             ],
             "scripts": []
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
+          }
         }
       }
     }
+  },
+  "cli": {
+    "schematicCollections": [
+      "@angular-eslint/schematics"
+    ]
   }
 }

@@ -1,0 +1,63 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #drawer class="sidenav" fixedInViewport
+      [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+      [mode]="(isHandset$ | async) ? 'over' : 'side'"
+      [opened]="(isHandset$ | async) === false">
+    <mat-toolbar>
+      <button
+        type="button"
+        aria-label="Collapse sidenav"
+        mat-icon-button
+        (click)="drawer.toggle()">
+        <mat-icon aria-label="Collapse nav icon">menu_open</mat-icon>
+      </button>
+      Menu
+    </mat-toolbar>
+    <mat-nav-list>
+      @for (item of rootRoutes; track $index) {
+        <a
+          mat-list-item
+          [routerLink]="item.path"
+          #link="routerLinkActive"
+          routerLinkActive
+          [activated]="link.isActive"
+        >
+          {{ item.title }}
+        </a>
+      }
+      <mat-button-toggle-group #group="matButtonToggleGroup" [(ngModel)]="currentTheme" (change)="switchTheme(group.value)" aria-label="Theme Toggle">
+        <mat-button-toggle value="dark">
+          <mat-icon>dark_mode</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="light">
+          <mat-icon>light_mode</mat-icon>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+      @if (this.authService.isLoggedIn()) {
+        <button mat-stroked-button (click)="logout()">Logout</button>
+      } @else {
+        <a routerLink="/login">Login</a>
+      }
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <mat-toolbar color="primary">
+<!--      @ if (isHandset$ | async) {-->
+      @if (!drawer.opened) {
+        <button
+          type="button"
+          aria-label="Toggle sidenav"
+          mat-icon-button
+          (click)="drawer.toggle()">
+          <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+        </button>
+      }
+      <span>Capital Copilot</span>
+    </mat-toolbar>
+    <div class="sidenav-scroll-wrapper">
+      <div class="sidenav-content">
+        <ng-content></ng-content>
+      </div>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

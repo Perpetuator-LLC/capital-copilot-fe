@@ -3,11 +3,11 @@ import { Injectable, Renderer2, RendererFactory2 } from '@angular/core';
 export type Theme = 'light' | 'dark';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ThemeService {
   private renderer: Renderer2;
-  private currentTheme: Theme = 'dark'; // default theme
+  currentTheme: Theme = 'dark'; // default theme
 
   constructor(rendererFactory: RendererFactory2) {
     this.renderer = rendererFactory.createRenderer(null, null);

@@ -1,22 +1,24 @@
 import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
-import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AuthService } from './auth.service';
 import { RouterTestingModule } from '@angular/router/testing';
 import { By } from '@angular/platform-browser';
-import { RouterLink, RouterOutlet } from '@angular/router';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('AppComponent', () => {
   let authService: jasmine.SpyObj<AuthService>;
 
   beforeEach(async () => {
-    const authServiceSpy = jasmine.createSpyObj('AuthService', ['isLoggedIn', 'logout']);
+    const authServiceSpy = jasmine.createSpyObj('AuthService', [
+      'isLoggedIn',
+      'logout',
+    ]);
 
     await TestBed.configureTestingModule({
       imports: [AppComponent, HttpClientTestingModule, RouterTestingModule],
       providers: [{ provide: AuthService, useValue: authServiceSpy }],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
     authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
@@ -46,7 +48,9 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('nav a[routerLink="/login"]')?.textContent).toContain('Login');
+    expect(
+      compiled.querySelector('nav a[routerLink="/login"]')?.textContent,
+    ).toContain('Login');
   });
 
   it('should render logout button when logged in', () => {

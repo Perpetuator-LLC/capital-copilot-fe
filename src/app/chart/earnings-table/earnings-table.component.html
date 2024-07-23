@@ -1,14 +1,14 @@
-@if (dataSource?.data?.loading) {
+@if (dataSource.data?.loading) {
   <div>
     <div class="loading-indicator">
       <mat-spinner></mat-spinner>
       <p>Loading data, please wait...</p>
     </div>
   </div>
-} @else if (dataSource?.data?.error) {
+} @else if (dataSource.data?.error) {
   <div>
     <div class="error">
-      <p>Error: {{ dataSource.data.error }}</p>
+      <p>Error: {{ dataSource.data?.error }}</p>
     </div>
   </div>
 } @else if (!earningsData) {
