@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, NgModule } from '@angular/core';
 import { AuthService } from '../auth.service';
 import * as mockData from './mock-data.json';
 import { MatButton } from '@angular/material/button';

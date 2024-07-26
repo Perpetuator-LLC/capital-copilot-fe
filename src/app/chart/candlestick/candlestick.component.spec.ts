@@ -1,7 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { CandlestickComponent, ChartData } from './candlestick.component';
+import { CandlestickComponent } from './candlestick.component';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { JsonPipe } from '@angular/common';
+import { ChartData } from '../../data.service';
 
 describe('CandlestickGraphComponent', () => {
   let component: CandlestickComponent;

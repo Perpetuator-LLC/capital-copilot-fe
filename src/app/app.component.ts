@@ -5,6 +5,7 @@ import { MatTab, MatTabGroup } from '@angular/material/tabs';
 import { MatButton, MatFabButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { LayoutComponent } from './layout/layout.component';
+import { CookieBannerComponent } from './cookie-banner/cookie-banner.component';
 
 @Component({
   selector: 'app-root',
@@ -20,6 +21,7 @@ import { LayoutComponent } from './layout/layout.component';
     MatIcon,
     MatFabButton,
     LayoutComponent,
+    CookieBannerComponent,
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],

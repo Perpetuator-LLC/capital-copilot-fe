@@ -9,6 +9,7 @@ import {
 } from '@angular/common/http';
 import { AuthInterceptorService } from './auth-interceptor.service';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { graphqlProvider } from './graphql.provider';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -20,6 +21,6 @@ export const appConfig: ApplicationConfig = {
       multi: true,
     },
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideAnimationsAsync(),
+    provideAnimationsAsync(), provideHttpClient(), graphqlProvider,
   ],
 };

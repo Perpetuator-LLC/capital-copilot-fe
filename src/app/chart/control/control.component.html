@@ -1,9 +1,5 @@
-<form [formGroup]="stockForm" (ngSubmit)="onSubmit()">
-  <label for="ticker">
-    Ticker:
-    <input matNativeControl type="text" formControlName="ticker" id="ticker" />
-  </label>
-  <button type="submit" [disabled]="!stockForm.valid">Go!</button>
+<form>
+  <app-autocomplete (optionSelected)="onAutocompleteSelected($event)"></app-autocomplete>
 </form>
 @if (error) {
   <div class="error">

@@ -42,6 +42,10 @@ $light-theme: mat.define-theme((
 
 @include mat.all-component-typographies($typography);
 
+// ignore-duplication-warnings: true is used to suppress warnings about duplicate styles
+// Supposedly we can use: @include mat.all-component-colors($dark-theme); but it doesn't work
+mat.$theme-ignore-duplication-warnings: true;
+
 body.dark {
   @include mat.all-component-themes($dark-theme);
 }

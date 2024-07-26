@@ -1,0 +1,38 @@
+.cookie-banner {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #424242; /* Material Design dark grey */
+  color: white;
+  text-align: left;
+  padding: 1em;
+  z-index: 1000;
+  //display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+//.cookie-text {
+//  flex: 1;
+//}
+
+.cookie-buttons {
+  //display: flex;
+  gap: 1em;
+}
+
+.privacy-link {
+  color: #BB86FC; /* Material Design secondary color */
+}
+
+//.cookie-banner {
+//  position: fixed;
+//  bottom: 0;
+//  width: 100%;
+//  background-color: rgba(0, 0, 0, 0.8);
+//  color: white;
+//  text-align: center;
+//  padding: 1em;
+//  z-index: 1000;
+//}
+

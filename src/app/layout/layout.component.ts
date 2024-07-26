@@ -17,6 +17,7 @@ import {
   MatButtonToggleGroup,
 } from '@angular/material/button-toggle';
 import { FormsModule } from '@angular/forms';
+import { CookieBannerComponent } from '../cookie-banner/cookie-banner.component';
 
 @Component({
   selector: 'app-layout',
@@ -35,6 +36,7 @@ import { FormsModule } from '@angular/forms';
     MatButtonToggleGroup,
     MatButtonToggle,
     FormsModule,
+    CookieBannerComponent,
   ],
 })
 export class LayoutComponent {

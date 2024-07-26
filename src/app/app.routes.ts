@@ -27,6 +27,14 @@ export const routes: Routes = [
     title: 'Valuation',
   },
   {
+    path: 'privacy-policy',
+    loadComponent: () =>
+      import('./privacy-policy/privacy-policy.component').then(
+        (c) => c.PrivacyPolicyComponent,
+      ),
+    title: 'Privacy Policy',
+  },
+  {
     path: 'login',
     loadComponent: () =>
       import('./login/login.component').then((c) => c.LoginComponent),

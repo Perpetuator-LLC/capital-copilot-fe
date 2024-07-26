@@ -6,27 +6,28 @@ import {
   Output,
 } from '@angular/core';
 import { ChartData, DataService } from '../../data.service';
-import {
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { CandlestickComponent } from '../candlestick/candlestick.component';
 import { Subscription } from 'rxjs';
 import { MatInput } from '@angular/material/input';
+import { AutocompleteComponent } from '../../autocomplete/autocomplete.component';
 
 @Component({
   selector: 'app-chart-control',
   standalone: true,
-  imports: [ReactiveFormsModule, CandlestickComponent, MatInput],
+  imports: [
+    CandlestickComponent,
+    MatInput,
+    AutocompleteComponent,
+    ReactiveFormsModule,
+  ],
   templateUrl: './control.component.html',
   styleUrl: './control.component.scss',
 })
 export class ControlComponent implements OnDestroy, AfterViewInit {
-  stockForm = new FormGroup({
-    ticker: new FormControl('', Validators.required),
-  });
+  // stockForm = new FormGroup({
+  //   ticker: new FormControl('', Validators.required),
+  // });
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   @Output() dataEmitter = new EventEmitter<any>();
   error: string | null = null;
@@ -38,12 +39,19 @@ export class ControlComponent implements OnDestroy, AfterViewInit {
     this.focusInput();
   }
 
-  onSubmit(): void {
-    this.error = null;
-    const ticker = this.stockForm?.value.ticker?.toUpperCase();
-    if (this.stockForm) {
-      this.stockForm.controls['ticker'].setValue('');
+  private focusInput() {
+    const input = document.querySelector<HTMLInputElement>('#ticker');
+    if (input) {
+      input.focus();
     }
+  }
+
+  onAutocompleteSelected(symbol: string) {
+    this.error = null;
+    const ticker = symbol.toUpperCase();
+    // if (this.stockForm) {
+    //   this.stockForm.controls['ticker'].setValue('');
+    // }
     this.dataEmitter.emit({ ticker: ticker, data: { loading: true } });
     this.subscription = this.dataService.fetchData(ticker).subscribe({
       next: (data: ChartData | null) => {
@@ -59,13 +67,6 @@ export class ControlComponent implements OnDestroy, AfterViewInit {
         this.focusInput();
       },
     });
-  }
-
-  private focusInput() {
-    const input = document.querySelector<HTMLInputElement>('#ticker');
-    if (input) {
-      input.focus();
-    }
   }
 
   ngOnDestroy() {
