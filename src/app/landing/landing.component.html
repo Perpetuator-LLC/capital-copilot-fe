@@ -1,4 +1,7 @@
-@if (authService.isLoggedIn()) {
+@if (isLoggedIn()) {
+<!--  <ng-template #toolbarTemplate>-->
+<!--    <span>Shared Toolbar Content</span>-->
+<!--  </ng-template>-->
   <app-chart-control (dataEmitter)="handleData($event)"></app-chart-control>
   <app-chart-earnings-table
     [dataSource]="dataSource"

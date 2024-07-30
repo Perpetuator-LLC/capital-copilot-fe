@@ -1,23 +1,25 @@
 .cookie-banner {
   position: fixed;
   bottom: 0;
-  width: 100%;
-  background-color: #424242; /* Material Design dark grey */
+  left: 0;
+  right: 0;
+  background-color: #424242; /* Ensure background is opaque */
   color: white;
   text-align: left;
   padding: 1em;
-  z-index: 1000;
-  //display: flex;
+  z-index: 2000; /* Higher z-index to be above nav */
+  display: flex;
   justify-content: space-between;
   align-items: center;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.3); /* Subtle shadow to separate from content */
 }
 
-//.cookie-text {
-//  flex: 1;
-//}
+.cookie-text {
+  flex: 1;
+}
 
 .cookie-buttons {
-  //display: flex;
+  display: flex;
   gap: 1em;
 }
 
@@ -25,14 +27,7 @@
   color: #BB86FC; /* Material Design secondary color */
 }
 
-//.cookie-banner {
-//  position: fixed;
-//  bottom: 0;
-//  width: 100%;
-//  background-color: rgba(0, 0, 0, 0.8);
-//  color: white;
-//  text-align: center;
-//  padding: 1em;
-//  z-index: 1000;
-//}
-
+/* Adjust margin or padding on the main content */
+.main-content {
+  margin-bottom: 80px; /* Adjust this value based on the height of your cookie banner */
+}

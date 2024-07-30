@@ -1,3 +1,4 @@
+<app-cookie-banner></app-cookie-banner>
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav #drawer class="sidenav" fixedInViewport
       [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
@@ -11,18 +12,30 @@
         (click)="drawer.toggle()">
         <mat-icon aria-label="Collapse nav icon">menu_open</mat-icon>
       </button>
-      Menu
+      Capital Copilot
     </mat-toolbar>
     <mat-nav-list>
-      @for (item of rootRoutes; track $index) {
+      @for (item of rootRoutes; track item.path) {
+        @if (shouldShow(item)) {
+          <a
+            mat-list-item
+            [routerLink]="item.path"
+            #link="routerLinkActive"
+            routerLinkActive
+            [activated]="link.isActive"
+          >
+            {{ item.title }}
+          </a>
+        }
+      }
+      @if (this.authService.isLoggedIn()) {
         <a
           mat-list-item
-          [routerLink]="item.path"
-          #link="routerLinkActive"
-          routerLinkActive
-          [activated]="link.isActive"
-        >
-          {{ item.title }}
+          tabindex="0"
+          (click)="logout()"
+          (keydown.enter)="logout()"
+          (keydown.space)="logout()">
+          Logout
         </a>
       }
       <mat-button-toggle-group #group="matButtonToggleGroup" [(ngModel)]="currentTheme" (change)="switchTheme(group.value)" aria-label="Theme Toggle">
@@ -33,11 +46,6 @@
           <mat-icon>light_mode</mat-icon>
         </mat-button-toggle>
       </mat-button-toggle-group>
-      @if (this.authService.isLoggedIn()) {
-        <button mat-stroked-button (click)="logout()">Logout</button>
-      } @else {
-        <a routerLink="/login">Login</a>
-      }
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
@@ -52,8 +60,26 @@
           <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
         </button>
       }
-      <span>Capital Copilot</span>
+      <!--        [ngTemplateOutletInjector]="injector"-->
+
+      B
+<!--      <ng-container toolbarContent></ng-container>-->
+      <div class="toolbar">{{ toolbarContent }}</div>
+<!--      <ng-container #toolbarContainer></ng-container>-->
+<!--      <ng-container [ngTemplateOutlet]="toolbarContent || defaultToolbarContent"></ng-container>-->
+<!--      <ng-template #defaultToolbarContent>-->
+<!--        <div>Default content</div>-->
+<!--      </ng-template>-->
+      A
+<!--      <ng-container [ngTemplateOutlet]="content()?.tpl || noContent"></ng-container>-->
+<!--      <ng-template #noContent>-->
+<!--        <span>Capital Copilot</span>-->
+<!--      </ng-template>-->
+<!--      <app-shared-toolbar> Content </app-shared-toolbar>-->
+<!--      <ng-content select="#toolbar"></ng-content>-->
+<!--      <app-toolbar [content]="toolbarContent"></app-toolbar>-->
     </mat-toolbar>
+<!--      <span>Capital Copilot</span>-->
     <div class="sidenav-scroll-wrapper">
       <div class="sidenav-content">
         <ng-content></ng-content>

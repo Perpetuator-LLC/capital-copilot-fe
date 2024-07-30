@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal, WritableSignal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { tap, switchMap, catchError } from 'rxjs/operators';
@@ -35,9 +35,8 @@ function decodeJWT(token: string): JWT {
 export class AuthService {
   private tokenUrl = 'http://127.0.0.1:8000/api/token/';
   private refreshTokenUrl = 'http://127.0.0.1:8000/api/token/refresh/';
-  private tokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<
-    string | null
-  >(this.getToken());
+  private tokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(this.getToken());
+  private loggedInSignal: WritableSignal<boolean> = signal(!this.isRefreshTokenExpired());
 
   constructor(private http: HttpClient) {}
 
@@ -54,16 +53,14 @@ export class AuthService {
       this.logout();
       return of(null);
     }
-    return this.http
-      .post<Token>(this.refreshTokenUrl, { refresh: refreshToken })
-      .pipe(
-        tap((response) => this.updateSession(response)),
-        catchError((error) => {
-          console.debug('Logging out, due to error refreshing token:', error);
-          this.logout();
-          return of(null);
-        }),
-      );
+    return this.http.post<Token>(this.refreshTokenUrl, { refresh: refreshToken }).pipe(
+      tap((response) => this.updateSession(response)),
+      catchError((error) => {
+        console.debug('Logging out, due to error refreshing token:', error);
+        this.logout();
+        return of(null);
+      }),
+    );
   }
 
   private setSession(authResult: Token) {
@@ -81,11 +78,9 @@ export class AuthService {
     localStorage.setItem('id_token', accessToken);
     localStorage.setItem('refresh_token', refreshToken);
     localStorage.setItem('expires_at', JSON.stringify(accessExpiresAt));
-    localStorage.setItem(
-      'refresh_expires_at',
-      JSON.stringify(refreshExpiresAt),
-    );
+    localStorage.setItem('refresh_expires_at', JSON.stringify(refreshExpiresAt));
 
+    this.loggedInSignal.set(!this.isRefreshTokenExpired());
     this.tokenSubject.next(accessToken);
   }
 
@@ -97,6 +92,7 @@ export class AuthService {
     localStorage.setItem('id_token', accessToken);
     localStorage.setItem('expires_at', JSON.stringify(accessExpiresAt));
 
+    this.loggedInSignal.set(!this.isRefreshTokenExpired());
     this.tokenSubject.next(accessToken);
   }
 
@@ -106,11 +102,12 @@ export class AuthService {
     localStorage.removeItem('expires_at');
     localStorage.removeItem('refresh_expires_at');
     // console.log('Logged out');
+    this.loggedInSignal.set(false);
     this.tokenSubject.next(null);
   }
 
-  public isLoggedIn(): boolean {
-    return !this.isRefreshTokenExpired();
+  get isLoggedIn(): WritableSignal<boolean> {
+    return this.loggedInSignal;
   }
 
   public getToken(): string | null {
@@ -130,11 +127,7 @@ export class AuthService {
 
   private isTokenExpired(): boolean {
     const expiration = localStorage.getItem('expires_at');
-    return (
-      expiration === null ||
-      expiration === undefined ||
-      new Date().getTime() >= JSON.parse(expiration)
-    );
+    return expiration === null || expiration === undefined || new Date().getTime() >= JSON.parse(expiration);
   }
 
   public isRefreshTokenExpired(): boolean {

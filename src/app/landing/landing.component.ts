@@ -1,4 +1,4 @@
-import { Component, NgModule } from '@angular/core';
+import { Component, TemplateRef, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { AuthService } from '../auth.service';
 import * as mockData from './mock-data.json';
 import { MatButton } from '@angular/material/button';
@@ -7,6 +7,9 @@ import { ChartData } from '../data.service';
 import { ControlComponent } from '../chart/control/control.component';
 import { EarningsTableComponent } from '../chart/earnings-table/earnings-table.component';
 import { CandlestickComponent } from '../chart/candlestick/candlestick.component';
+import { LayoutComponent } from '../layout/layout.component';
+import { NgTemplateOutlet } from '@angular/common';
+import { ToolbarService } from '../toolbar.service';
 
 @Component({
   selector: 'app-landing',
@@ -17,14 +20,33 @@ import { CandlestickComponent } from '../chart/candlestick/candlestick.component
     EarningsTableComponent,
     MatButton,
     MatBadge,
+    LayoutComponent,
+    NgTemplateOutlet,
   ],
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.scss'],
 })
-export class LandingComponent {
+export class LandingComponent implements OnInit, OnDestroy {
   dataSource: ChartData = mockData;
+  isLoggedIn = this.authService.isLoggedIn;
+  @ViewChild('toolbarTemplate', { static: true }) toolbarContent!: TemplateRef<any>;
 
-  constructor(public authService: AuthService) {}
+  constructor(
+    public authService: AuthService,
+    private toolbarService: ToolbarService,
+  ) {}
+
+  // getToolbarTemplate() {
+  //   return this.toolbarContent;
+  // }
+
+  ngOnInit() {
+    this.toolbarService.setToolbarContent('Child 1 Toolbar Content');
+  }
+
+  ngOnDestroy() {
+    this.toolbarService.clearToolbarContent();
+  }
 
   handleData(data: ChartData) {
     this.dataSource = data;

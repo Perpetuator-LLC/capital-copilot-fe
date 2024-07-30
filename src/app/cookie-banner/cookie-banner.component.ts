@@ -1,10 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { NgIf } from '@angular/common';
+import { MatButton } from '@angular/material/button';
+import { MatCardFooter } from '@angular/material/card';
+import { MatTabLink } from '@angular/material/tabs';
 
 @Component({
   selector: 'app-cookie-banner',
   standalone: true,
-  imports: [NgIf],
+  imports: [NgIf, MatButton, MatCardFooter, MatTabLink],
   templateUrl: './cookie-banner.component.html',
   styleUrls: ['./cookie-banner.component.scss'],
 })
