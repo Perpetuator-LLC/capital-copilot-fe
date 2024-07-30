@@ -60,26 +60,8 @@
           <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
         </button>
       }
-      <!--        [ngTemplateOutletInjector]="injector"-->
-
-      B
-<!--      <ng-container toolbarContent></ng-container>-->
-      <div class="toolbar">{{ toolbarContent }}</div>
-<!--      <ng-container #toolbarContainer></ng-container>-->
-<!--      <ng-container [ngTemplateOutlet]="toolbarContent || defaultToolbarContent"></ng-container>-->
-<!--      <ng-template #defaultToolbarContent>-->
-<!--        <div>Default content</div>-->
-<!--      </ng-template>-->
-      A
-<!--      <ng-container [ngTemplateOutlet]="content()?.tpl || noContent"></ng-container>-->
-<!--      <ng-template #noContent>-->
-<!--        <span>Capital Copilot</span>-->
-<!--      </ng-template>-->
-<!--      <app-shared-toolbar> Content </app-shared-toolbar>-->
-<!--      <ng-content select="#toolbar"></ng-content>-->
-<!--      <app-toolbar [content]="toolbarContent"></app-toolbar>-->
+      <ng-container #toolbarContainer></ng-container>
     </mat-toolbar>
-<!--      <span>Capital Copilot</span>-->
     <div class="sidenav-scroll-wrapper">
       <div class="sidenav-content">
         <ng-content></ng-content>

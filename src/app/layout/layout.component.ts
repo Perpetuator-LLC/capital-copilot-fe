@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, ViewChild, OnDestroy, ViewContainerRef, ComponentRef } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
-import { Observable, Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { Route, RouterLink, RouterLinkActive } from '@angular/router';
 import { routes } from '../app.routes';
@@ -48,35 +48,7 @@ export class LayoutComponent implements OnDestroy, OnInit {
   isLoggedIn = this.authService.isLoggedIn;
   private authRequiredRoutes = ['logout', 'charts', 'times', 'valuation'];
 
-  // @ViewChild('toolbarContainer', { read: ViewContainerRef, static: true }) toolbarContainer!: ViewContainerRef;
-  toolbarContent: string | null = null;
-  private subscription: Subscription | undefined;
-
-  // @ContentChild('toolbarContent') toolbarTemplate!: TemplateRef<any>;
-  // @ContentChild('toolbarTemplate', { static: true }) toolbarTemplate!: TemplateRef<any>;
-
-  // ngAfterContentInit() {
-  //   if (this.toolbarTemplate) {
-  //     this.toolbarContainer.createEmbeddedView(this.toolbarTemplate);
-  //   }
-  // }
-
-  // onActivate(component: any) {
-  //   if (component.getToolbarTemplate) {
-  //     const toolbarTemplate = component.getToolbarTemplate();
-  //     this.toolbarContainer.clear();
-  //     this.toolbarContainer.createEmbeddedView(toolbarTemplate);
-  //   }
-  // }
-
-  // @Input() toolbarTemplate!: TemplateRef<any>;
-  // injector = inject();
-
-  // @ViewChild('container', { read: ViewContainerRef }) container!: ViewContainerRef;
-  // @ViewChild('defaultToolbarContent') toolbarTemplate!: TemplateRef<any>;
-
-  // @ViewChild('toolbarContent', { static: true }) toolbarContent!: TemplateRef<any>;
-  // content = contentChild(WidgetContentDirective);
+  @ViewChild('toolbarContainer', { read: ViewContainerRef, static: true }) toolbarContainer!: ViewContainerRef;
 
   constructor(
     protected themeService: ThemeService,
@@ -87,13 +59,11 @@ export class LayoutComponent implements OnDestroy, OnInit {
   }
 
   ngOnInit() {
-    this.subscription = this.toolbarService.toolbarContent$.subscribe((content) => {
-      this.toolbarContent = content;
-    });
+    this.toolbarService.setRootViewContainerRef(this.toolbarContainer);
   }
 
   ngOnDestroy() {
-    this.subscription?.unsubscribe();
+    this.toolbarService.clearToolbarComponent();
   }
 
   shouldShow(item: Route): boolean {

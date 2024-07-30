@@ -1,18 +1,26 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { ComponentRef, Injectable, Type, ViewContainerRef } from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ToolbarService {
-  private toolbarContent = new BehaviorSubject<string | null>(null);
-  public toolbarContent$ = this.toolbarContent.asObservable();
+  private viewContainerRef!: ViewContainerRef;
 
-  setToolbarContent(content: string) {
-    this.toolbarContent.next(content);
+  setRootViewContainerRef(viewContainerRef: ViewContainerRef) {
+    this.viewContainerRef = viewContainerRef;
   }
 
-  clearToolbarContent() {
-    this.toolbarContent.next(null);
+  setToolbarComponent(component: Type<any>): ComponentRef<any> | null {
+    if (this.viewContainerRef) {
+      this.viewContainerRef.clear();
+      return this.viewContainerRef.createComponent(component);
+    }
+    return null;
+  }
+
+  clearToolbarComponent() {
+    if (this.viewContainerRef) {
+      this.viewContainerRef.clear();
+    }
   }
 }

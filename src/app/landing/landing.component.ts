@@ -36,16 +36,17 @@ export class LandingComponent implements OnInit, OnDestroy {
     private toolbarService: ToolbarService,
   ) {}
 
-  // getToolbarTemplate() {
-  //   return this.toolbarContent;
-  // }
-
   ngOnInit() {
-    this.toolbarService.setToolbarContent('Child 1 Toolbar Content');
+    if (this.isLoggedIn()) {
+      const componentRef = this.toolbarService.setToolbarComponent(ControlComponent);
+      if (componentRef) {
+        componentRef.instance.dataEmitter.subscribe((data: any) => this.handleData(data));
+      }
+    }
   }
 
   ngOnDestroy() {
-    this.toolbarService.clearToolbarContent();
+    this.toolbarService.clearToolbarComponent();
   }
 
   handleData(data: ChartData) {
