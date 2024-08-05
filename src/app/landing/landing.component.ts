@@ -1,4 +1,4 @@
-import { Component, TemplateRef, ViewChild, OnInit, OnDestroy } from '@angular/core';
+import { Component, TemplateRef, ViewChild, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { AuthService } from '../auth.service';
 import * as mockData from './mock-data.json';
 import { MatButton } from '@angular/material/button';
@@ -26,22 +26,21 @@ import { ToolbarService } from '../toolbar.service';
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.scss'],
 })
-export class LandingComponent implements OnInit, OnDestroy {
+export class LandingComponent implements AfterViewInit, OnDestroy {
   dataSource: ChartData = mockData;
   isLoggedIn = this.authService.isLoggedIn;
-  @ViewChild('toolbarTemplate', { static: true }) toolbarContent!: TemplateRef<any>;
+  @ViewChild('toolbarTemplate', { static: true }) toolbarTemplate!: TemplateRef<any>;
 
   constructor(
     public authService: AuthService,
     private toolbarService: ToolbarService,
   ) {}
 
-  ngOnInit() {
+  ngAfterViewInit() {
     if (this.isLoggedIn()) {
-      const componentRef = this.toolbarService.setToolbarComponent(ControlComponent);
-      if (componentRef) {
-        componentRef.instance.dataEmitter.subscribe((data: any) => this.handleData(data));
-      }
+      const viewContainerRef = this.toolbarService.getViewContainerRef();
+      viewContainerRef.clear();
+      viewContainerRef.createEmbeddedView(this.toolbarTemplate);
     }
   }
 

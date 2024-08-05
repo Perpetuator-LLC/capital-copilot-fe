@@ -1,4 +1,4 @@
-import { ComponentRef, Injectable, Type, ViewContainerRef } from '@angular/core';
+import { Injectable, ViewContainerRef } from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
@@ -10,12 +10,8 @@ export class ToolbarService {
     this.viewContainerRef = viewContainerRef;
   }
 
-  setToolbarComponent(component: Type<any>): ComponentRef<any> | null {
-    if (this.viewContainerRef) {
-      this.viewContainerRef.clear();
-      return this.viewContainerRef.createComponent(component);
-    }
-    return null;
+  getViewContainerRef(): ViewContainerRef {
+    return this.viewContainerRef;
   }
 
   clearToolbarComponent() {
