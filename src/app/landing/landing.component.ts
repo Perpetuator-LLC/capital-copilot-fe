@@ -1,6 +1,5 @@
-import { Component, TemplateRef, ViewChild, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, TemplateRef, ViewChild, OnDestroy, AfterViewInit } from '@angular/core';
 import { AuthService } from '../auth.service';
-import * as mockData from './mock-data.json';
 import { MatButton } from '@angular/material/button';
 import { MatBadge } from '@angular/material/badge';
 import { ChartData } from '../data.service';
@@ -10,6 +9,7 @@ import { CandlestickComponent } from '../chart/candlestick/candlestick.component
 import { LayoutComponent } from '../layout/layout.component';
 import { NgTemplateOutlet } from '@angular/common';
 import { ToolbarService } from '../toolbar.service';
+import dataSource from './mock-data.json';
 
 @Component({
   selector: 'app-landing',
@@ -27,7 +27,7 @@ import { ToolbarService } from '../toolbar.service';
   styleUrls: ['./landing.component.scss'],
 })
 export class LandingComponent implements AfterViewInit, OnDestroy {
-  dataSource: ChartData = mockData;
+  dataSource: ChartData = dataSource;
   isLoggedIn = this.authService.isLoggedIn;
   @ViewChild('toolbarTemplate', { static: true }) toolbarTemplate!: TemplateRef<any>;
 

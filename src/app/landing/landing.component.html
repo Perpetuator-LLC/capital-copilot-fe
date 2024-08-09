@@ -4,9 +4,7 @@
   }
 </ng-template>
 @if (isLoggedIn()) {
-  <app-chart-earnings-table
-    [dataSource]="dataSource"
-  ></app-chart-earnings-table>
+  <app-chart-earnings-table [dataSource]="dataSource"></app-chart-earnings-table>
   <app-chart-candlestick [dataSource]="dataSource"></app-chart-candlestick>
 } @else {
   <p>Please login to use the app.</p>

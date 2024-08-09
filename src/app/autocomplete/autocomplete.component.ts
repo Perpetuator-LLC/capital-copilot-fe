@@ -1,29 +1,13 @@
-import {
-  Component,
-  ElementRef,
-  EventEmitter,
-  Output,
-  ViewChild,
-} from '@angular/core';
+import { Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { Observable, of } from 'rxjs';
+import { Observable, of, take } from 'rxjs';
 import { debounceTime, switchMap, startWith, map } from 'rxjs/operators';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
-import {
-  MatAutocomplete,
-  MatAutocompleteTrigger,
-  MatOption,
-} from '@angular/material/autocomplete';
+import { MatAutocomplete, MatAutocompleteTrigger, MatOption } from '@angular/material/autocomplete';
 import { AsyncPipe, NgForOf } from '@angular/common';
 import { MatInput } from '@angular/material/input';
 import { Apollo, gql } from 'apollo-angular';
-import {
-  MatCard,
-  MatCardContent,
-  MatCardHeader,
-  MatCardSubtitle,
-  MatCardTitle,
-} from '@angular/material/card';
+import { MatCard, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle } from '@angular/material/card';
 import { MatTooltip } from '@angular/material/tooltip';
 
 const AUTOCOMPLETE_QUERY = gql`
@@ -77,6 +61,7 @@ export class AutocompleteComponent {
   @ViewChild('input') input!: ElementRef<HTMLInputElement>;
   @Output() optionSelected = new EventEmitter<string>();
   @Output() enterPressed = new EventEmitter<void>();
+  @Output() valueSubmitted = new EventEmitter<string>();
 
   constructor(private readonly apollo: Apollo) {
     this.filteredOptions = this.tickerControl.valueChanges.pipe(
@@ -107,7 +92,20 @@ export class AutocompleteComponent {
   onKeydown(event: KeyboardEvent) {
     if (event.key === 'Enter') {
       event.preventDefault(); // Prevent form submission on Enter key press
-      this.enterPressed.emit();
+
+      const inputValue = this.tickerControl.value;
+      this.filteredOptions
+        .pipe(
+          take(1), // Take the first occurrence to avoid multiple subscriptions
+          map((options) => options.some((option) => option.symbol === inputValue || option.name === inputValue)),
+        )
+        .subscribe((isOption) => {
+          if (isOption) {
+            this.enterPressed.emit(); // Handle selection with enter
+          } else {
+            this.valueSubmitted.emit(inputValue); // Handle input with enter
+          }
+        });
     }
   }
 }

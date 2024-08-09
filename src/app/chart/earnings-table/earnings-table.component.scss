@@ -9,14 +9,3 @@ table {
 .mat-header-cell {
   display: none;
 }
-
-.loading-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  p {
-    font-size: 1.2em;
-    color: #333;
-  }
-}

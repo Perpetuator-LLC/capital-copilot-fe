@@ -1,7 +1,8 @@
-<form class="example-form">
-  <mat-form-field appearance="fill" class="example-full-width">
-    <mat-label>Stock Ticker</mat-label>
-    <input id="ticker" type="text" placeholder="Enter the stock symbol" matInput
+<form class="ticker-form">
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Symbol</mat-label>
+    <input id="ticker" type="text" placeholder="Enter the symbol" matInput
+           class="mat-autocomplete-panel"
            [formControl]="tickerControl"
            [matAutocomplete]="auto"
            (keydown)="onKeydown($event)">
@@ -13,23 +14,9 @@
               <mat-card-title>{{ option.name }}</mat-card-title>
               <mat-card-subtitle>{{ option.symbol }}</mat-card-subtitle>
             </mat-card-header>
-            <!--        <mat-card-content>-->
-            <!--          <p>{{ option.price }} ({{ option.percent }})</p>-->
-            <!--        </mat-card-content>-->
           </mat-card>
         </mat-option>
       }
-<!--      <mat-option *ngFor="let option of filteredOptions | async" [value]="option.symbol">-->
-<!--        <mat-card matTooltip="{{ option.cik }}">-->
-<!--          <mat-card-header>-->
-<!--            <mat-card-title>{{ option.name }}</mat-card-title>-->
-<!--            <mat-card-subtitle>{{ option.symbol }}</mat-card-subtitle>-->
-<!--          </mat-card-header>-->
-<!--          &lt;!&ndash;        <mat-card-content>&ndash;&gt;-->
-<!--          &lt;!&ndash;          <p>{{ option.price }} ({{ option.percent }})</p>&ndash;&gt;-->
-<!--          &lt;!&ndash;        </mat-card-content>&ndash;&gt;-->
-<!--        </mat-card>-->
-<!--      </mat-option>-->
     </mat-autocomplete>
   </mat-form-field>
 </form>

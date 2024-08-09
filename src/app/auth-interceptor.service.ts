@@ -1,10 +1,5 @@
 import { Injectable } from '@angular/core';
-import {
-  HttpEvent,
-  HttpInterceptor,
-  HttpHandler,
-  HttpRequest,
-} from '@angular/common/http';
+import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest } from '@angular/common/http';
 import { Observable, from } from 'rxjs';
 import { switchMap, catchError } from 'rxjs/operators';
 import { AuthService } from './auth.service';
@@ -13,6 +8,7 @@ import { Router } from '@angular/router';
 @Injectable()
 export class AuthInterceptorService implements HttpInterceptor {
   private excludedUrls = [
+    'http://127.0.0.1:8000/api/register/',
     'http://127.0.0.1:8000/api/token/',
     'http://127.0.0.1:8000/api/token/refresh/',
   ];
@@ -22,27 +18,20 @@ export class AuthInterceptorService implements HttpInterceptor {
     private router: Router,
   ) {}
 
-  intercept(
-    req: HttpRequest<unknown>,
-    next: HttpHandler,
-  ): Observable<HttpEvent<unknown>> {
-    // Check if the request URL is in the excluded list
+  intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     if (this.excludedUrls.some((url) => req.url.includes(url))) {
       return next.handle(req);
     }
 
-    // console.log('Interceptor hit...');
     if (this.authService.isRefreshTokenExpired()) {
-      // console.log('...refresh token expired');
       this.authService.logout();
+      console.debug('AuthInterceptor: Redirecting to login page');
       this.router.navigate(['/login']);
       return new Observable<HttpEvent<unknown>>();
     }
 
-    // console.log('...refresh token not expired');
     return from(this.authService.getTokenObservable()).pipe(
       switchMap((token) => {
-        // console.log('...token:', token);
         if (token) {
           req = req.clone({
             setHeaders: {
@@ -54,6 +43,7 @@ export class AuthInterceptorService implements HttpInterceptor {
           catchError((error) => {
             if (error.status === 401) {
               this.authService.logout();
+              console.debug('AuthInterceptor: Redirecting to login page');
               this.router.navigate(['/login']);
             }
             throw error;

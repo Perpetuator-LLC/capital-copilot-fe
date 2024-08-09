@@ -39,7 +39,17 @@ export class ControlComponent implements OnDestroy, AfterViewInit {
     }
   }
 
-  onAutocompleteSelected(symbol: string) {
+  handleSelection(value: string) {
+    console.log('Option Selected:', value);
+    this.getIt(value);
+  }
+
+  handleSubmit(value: string) {
+    console.log('Value Submitted:', value);
+    this.getIt(value);
+  }
+
+  getIt(symbol: string) {
     this.error = null;
     const ticker = symbol.toUpperCase();
     // if (this.stockForm) {

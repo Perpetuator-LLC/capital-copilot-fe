@@ -11,53 +11,94 @@
         mat-icon-button
         (click)="drawer.toggle()">
         <mat-icon aria-label="Collapse nav icon">menu_open</mat-icon>
+        Capital Copilot
       </button>
-      Capital Copilot
     </mat-toolbar>
     <mat-nav-list>
-      @for (item of rootRoutes; track item.path) {
-        @if (shouldShow(item)) {
+<!--      Add buttons...-->
+<!--      @if ((isHandset$ | async) === false && !drawer.opened) {-->
+<!--          @for (item of rootRoutes; track item.path) {-->
+<!--            @if (shouldShow(item)) {-->
+<!--              <button-->
+<!--                type="button"-->
+<!--                aria-label="A menu button (add title?)"-->
+<!--                mat-icon-button-->
+<!--                [routerLink]="item.path"-->
+<!--                #link="routerLinkActive"-->
+<!--                routerLinkActive-->
+<!--              >-->
+<!--                <mat-icon>menu_open</mat-icon>-->
+<!--              </button>-->
+<!--            }-->
+<!--          }-->
+<!--          @if (this.authService.isLoggedIn()) {-->
+<!--            <a-->
+<!--              mat-list-item-->
+<!--              tabindex="0"-->
+<!--              (click)="logout()"-->
+<!--              (keydown.enter)="logout()"-->
+<!--              (keydown.space)="logout()">-->
+<!--              Logout-->
+<!--            </a>-->
+<!--          }-->
+<!--      } @else {-->
+        @for (item of rootRoutes; track item.path) {
+          @if (shouldShow(item)) {
+            <a
+              mat-list-item
+              [routerLink]="item.path"
+              #link="routerLinkActive"
+              routerLinkActive
+              [activated]="link.isActive"
+            >
+              {{ item.title }}
+            </a>
+          }
+        }
+        @if (this.authService.isLoggedIn()) {
           <a
             mat-list-item
-            [routerLink]="item.path"
-            #link="routerLinkActive"
-            routerLinkActive
-            [activated]="link.isActive"
-          >
-            {{ item.title }}
+            tabindex="0"
+            (click)="logout()"
+            (keydown.enter)="logout()"
+            (keydown.space)="logout()">
+            Logout
           </a>
         }
-      }
-      @if (this.authService.isLoggedIn()) {
+        <mat-button-toggle-group #group="matButtonToggleGroup" [(ngModel)]="currentTheme" (change)="switchTheme(group.value)" aria-label="Theme Toggle">
+          <mat-button-toggle value="dark">
+            <mat-icon>dark_mode</mat-icon>
+          </mat-button-toggle>
+          <mat-button-toggle value="light">
+            <mat-icon>light_mode</mat-icon>
+          </mat-button-toggle>
+        </mat-button-toggle-group>
         <a
           mat-list-item
           tabindex="0"
-          (click)="logout()"
-          (keydown.enter)="logout()"
-          (keydown.space)="logout()">
-          Logout
+          target="_blank"
+          href="privacy-policy.html">
+          Privacy Policy
         </a>
-      }
-      <mat-button-toggle-group #group="matButtonToggleGroup" [(ngModel)]="currentTheme" (change)="switchTheme(group.value)" aria-label="Theme Toggle">
-        <mat-button-toggle value="dark">
-          <mat-icon>dark_mode</mat-icon>
-        </mat-button-toggle>
-        <mat-button-toggle value="light">
-          <mat-icon>light_mode</mat-icon>
-        </mat-button-toggle>
-      </mat-button-toggle-group>
+        <a
+          mat-list-item
+          tabindex="0"
+          target="_blank"
+          href="terms-and-conditions.html">
+          Terms and Conditions
+        </a>
+<!--      }-->
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
     <mat-toolbar color="primary">
-<!--      @ if (isHandset$ | async) {-->
       @if (!drawer.opened) {
         <button
           type="button"
           aria-label="Toggle sidenav"
           mat-icon-button
           (click)="drawer.toggle()">
-          <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+          <img src="Capital_Copilot_Logo_Slanted.png" aria-label="Side nav toggle icon" alt="Capital Copilot">
         </button>
       }
       <ng-container #toolbarContainer></ng-container>

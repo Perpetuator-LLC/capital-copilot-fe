@@ -9,7 +9,7 @@ export const routes: Routes = [
   {
     path: 'charts',
     loadComponent: () => import('./landing/landing.component').then((c) => c.LandingComponent),
-    title: 'Dashboard',
+    title: 'Charts',
   },
   {
     path: 'times',
@@ -27,9 +27,15 @@ export const routes: Routes = [
     title: 'Privacy Policy',
   },
   {
-    path: 'eula',
-    loadComponent: () => import('./eula/eula.component').then((c) => c.EulaComponent),
-    title: 'End User License Agreement',
+    path: 'terms-and-conditions',
+    loadComponent: () =>
+      import('./terms-and-conditions/terms-and-conditions.component').then((c) => c.TermsAndConditionsComponent),
+    title: 'Terms and Conditions',
+  },
+  {
+    path: 'register',
+    loadComponent: () => import('./register/register.component').then((c) => c.RegisterComponent),
+    title: 'Register',
   },
   {
     path: 'login',

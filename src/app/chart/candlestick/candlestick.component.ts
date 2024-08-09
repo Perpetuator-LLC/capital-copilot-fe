@@ -28,6 +28,7 @@ import {
 } from 'ng-apexcharts';
 import { JsonPipe } from '@angular/common';
 import { ChartData, OHLC, Squeeze } from '../../data.service';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 export interface ChartOptions {
   title: ApexTitleSubtitle;
@@ -47,7 +48,7 @@ export interface ChartOptions {
 }
 
 @Component({
-  imports: [NgApexchartsModule, JsonPipe],
+  imports: [NgApexchartsModule, JsonPipe, MatProgressSpinner],
   selector: 'app-chart-candlestick',
   standalone: true,
   styleUrls: ['./candlestick.component.scss'],
@@ -61,18 +62,10 @@ export class CandlestickComponent implements OnChanges, AfterViewInit {
   @Input() dataSource: ChartData = {};
   @Output() candleDoubleClicked = new EventEmitter<MouseEvent>();
   @Output() volumeDoubleClicked = new EventEmitter<MouseEvent>();
-  @ViewChild('chartScrollbar', { static: false }) scrollbarChart:
-    | ChartComponent
-    | undefined;
-  @ViewChild('chartCandlePrice', { static: false }) candlePriceChart:
-    | ChartComponent
-    | undefined;
-  @ViewChild('chartBarVolume', { static: false }) barVolumeChart:
-    | ChartComponent
-    | undefined;
-  @ViewChild('chartSqueeze', { static: false }) squeezeChart:
-    | ChartComponent
-    | undefined;
+  @ViewChild('chartScrollbar', { static: false }) scrollbarChart: ChartComponent | undefined;
+  @ViewChild('chartCandlePrice', { static: false }) candlePriceChart: ChartComponent | undefined;
+  @ViewChild('chartBarVolume', { static: false }) barVolumeChart: ChartComponent | undefined;
+  @ViewChild('chartSqueeze', { static: false }) squeezeChart: ChartComponent | undefined;
   @ViewChild('chartContainer') chartContainer!: ElementRef<HTMLDivElement>;
 
   public scrollbarOptions: ChartOptions;
@@ -109,9 +102,14 @@ export class CandlestickComponent implements OnChanges, AfterViewInit {
         },
         events: {
           click: (event, chartContext, config) => {
-            console.debug('Chart Context:', chartContext);
-            console.debug('Config:', config);
+            // console.debug('Chart Context:', chartContext);
+            // console.debug('Config:', config);
             this.handleCandleClick(event);
+          },
+          mounted: (chartContext, config) => {
+            // console.debug('Chart Context:', chartContext);
+            // console.debug('Config:', config);
+            this.resetZoom();
           },
         },
       },
@@ -179,7 +177,7 @@ export class CandlestickComponent implements OnChanges, AfterViewInit {
           show: true,
           align: 'left',
           formatter: function (val: number, opts?: never): string | string[] {
-            console.debug('Opts:', opts);
+            // console.debug('Opts:', opts);
             return val.toFixed(2);
           },
         },
@@ -217,8 +215,8 @@ export class CandlestickComponent implements OnChanges, AfterViewInit {
         },
         events: {
           click: (event, chartContext, config) => {
-            console.debug('Chart Context:', chartContext);
-            console.debug('Config:', config);
+            // console.debug('Chart Context:', chartContext);
+            // console.debug('Config:', config);
             this.handleVolumeClick(event);
           },
         },
@@ -266,8 +264,8 @@ export class CandlestickComponent implements OnChanges, AfterViewInit {
         },
         events: {
           click: (event, chartContext, config) => {
-            console.debug('Chart Context:', chartContext);
-            console.debug('Config:', config);
+            // console.debug('Chart Context:', chartContext);
+            // console.debug('Config:', config);
             this.handleVolumeClick(event);
           },
         },
@@ -287,7 +285,7 @@ export class CandlestickComponent implements OnChanges, AfterViewInit {
           show: true,
           align: 'left',
           formatter: function (val: number, opts?: never): string | string[] {
-            console.debug('Opts:', opts);
+            // console.debug('Opts:', opts);
             return val.toFixed(2);
           },
         },
@@ -447,13 +445,7 @@ export class CandlestickComponent implements OnChanges, AfterViewInit {
     });
     const series = seriesData.map((data, index) => {
       const dark = true;
-      const color = dark
-        ? index === 1
-          ? '#777'
-          : '#444'
-        : index === 1
-          ? '#777'
-          : '#DDD';
+      const color = dark ? (index === 1 ? '#777' : '#444') : index === 1 ? '#777' : '#DDD';
       const element = {
         name: `Line ${index + 1}`,
         data,
@@ -510,20 +502,15 @@ export class CandlestickComponent implements OnChanges, AfterViewInit {
   }
 
   updateVolumeData() {
-    this.barVolumeOptions.series = [
-      { name: 'volumeSeries', data: this.dataSource['volume'] || [] },
-    ];
+    this.barVolumeOptions.series = [{ name: 'volumeSeries', data: this.dataSource['volume'] || [] }];
   }
 
   updateSqueezeData() {
     const squeezeData = this.dataSource['squeeze'] || [];
     const squeezeColors = this.determineBarColors(squeezeData);
     this.squeezeChartOptions.colors = squeezeColors;
-    // this.squeezeChartOptions.xaxis.categories = Array.from({ length: squeezeData.length }, (_, i) => i + 1) // Creating an array of indices
 
-    this.squeezeChartOptions.series = [
-      { name: 'squeezeSeries', data: squeezeData },
-    ];
+    this.squeezeChartOptions.series = [{ name: 'squeezeSeries', data: squeezeData }];
     if (this.dataSource && this.dataSource['squeeze']) {
       const annotations: ApexAnnotations = {
         points: [],
@@ -590,9 +577,7 @@ export class CandlestickComponent implements OnChanges, AfterViewInit {
   }
 
   updateScrollbarData() {
-    this.scrollbarOptions.series = [
-      { name: 'ohlcSeries', data: this.dataSource['ohlc'] || [] },
-    ];
+    this.scrollbarOptions.series = [{ name: 'ohlcSeries', data: this.dataSource['ohlc'] || [] }];
   }
 
   handleCandleClick(event: MouseEvent) {

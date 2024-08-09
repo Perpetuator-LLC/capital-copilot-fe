@@ -13,20 +13,22 @@ interface JWT {
   exp: number;
 }
 
-// TODO: refactor this function to a utility file
-function decodeJWT(token: string): JWT {
-  const base64Url = token.split('.')[1];
-  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-  const jsonPayload = decodeURIComponent(
-    atob(base64)
-      .split('')
-      .map((c) => {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      })
-      .join(''),
-  );
-
-  return JSON.parse(jsonPayload);
+// Utility function to decode JWT token
+function decodeJWT(token: string): JWT | null {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => `%${('00' + c.charCodeAt(0).toString(16)).slice(-2)}`)
+        .join(''),
+    );
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    console.error('Failed to decode JWT:', e);
+    return null;
+  }
 }
 
 @Injectable({
@@ -35,19 +37,33 @@ function decodeJWT(token: string): JWT {
 export class AuthService {
   private tokenUrl = 'http://127.0.0.1:8000/api/token/';
   private refreshTokenUrl = 'http://127.0.0.1:8000/api/token/refresh/';
+  private registerUrl = 'http://127.0.0.1:8000/api/register/';
   private tokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(this.getToken());
   private loggedInSignal: WritableSignal<boolean> = signal(!this.isRefreshTokenExpired());
 
   constructor(private http: HttpClient) {}
 
-  login(username: string, password: string): Observable<unknown> {
-    return this.http
-      .post<Token>(this.tokenUrl, { username, password })
-      .pipe(tap((response) => this.setSession(response)));
+  login(username: string, password: string): Observable<Token | null> {
+    return this.http.post<Token>(this.tokenUrl, { username, password }).pipe(
+      tap((response) => this.setSession(response)),
+      catchError((error) => {
+        console.error('Login error:', error);
+        return of(null); // Ensuring that we always return an Observable of the same type
+      }),
+    );
   }
 
-  refreshToken(): Observable<unknown> {
-    // console.log("Refreshing token...");
+  register(username: string, email: string, password: string): Observable<Token | null> {
+    return this.http.post<Token>(this.registerUrl, { username, email, password }).pipe(
+      tap((response: Token) => this.setSession(response)),
+      catchError((error) => {
+        console.error('Registration error:', error);
+        return of(null);
+      }),
+    );
+  }
+
+  refreshToken(): Observable<Token | null> {
     const refreshToken = this.getRefreshToken();
     if (!refreshToken || this.isRefreshTokenExpired()) {
       this.logout();
@@ -67,13 +83,19 @@ export class AuthService {
     const accessToken = authResult.access;
     const refreshToken = authResult.refresh;
 
-    const decodedAccessToken: JWT = decodeJWT(accessToken);
+    const decodedAccessToken: JWT | null = decodeJWT(accessToken);
+    if (!decodedAccessToken) {
+      console.error('Failed to decode access token');
+      return;
+    }
     const accessExpiresAt = decodedAccessToken.exp * 1000;
-    // console.log('Access Token Expiry:', new Date(accessExpiresAt));
 
-    const decodedRefreshToken: JWT = decodeJWT(refreshToken);
+    const decodedRefreshToken: JWT | null = decodeJWT(refreshToken);
+    if (!decodedRefreshToken) {
+      console.error('Failed to decode refresh token');
+      return;
+    }
     const refreshExpiresAt = decodedRefreshToken.exp * 1000;
-    // console.log('Refresh Token Expiry:', new Date(refreshExpiresAt));
 
     localStorage.setItem('id_token', accessToken);
     localStorage.setItem('refresh_token', refreshToken);
@@ -86,7 +108,11 @@ export class AuthService {
 
   private updateSession(authResult: Token) {
     const accessToken = authResult.access;
-    const decodedAccessToken: JWT = decodeJWT(accessToken);
+    const decodedAccessToken: JWT | null = decodeJWT(accessToken);
+    if (!decodedAccessToken) {
+      console.error('Failed to decode access token');
+      return;
+    }
     const accessExpiresAt = decodedAccessToken.exp * 1000;
 
     localStorage.setItem('id_token', accessToken);
@@ -101,7 +127,6 @@ export class AuthService {
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('expires_at');
     localStorage.removeItem('refresh_expires_at');
-    // console.log('Logged out');
     this.loggedInSignal.set(false);
     this.tokenSubject.next(null);
   }

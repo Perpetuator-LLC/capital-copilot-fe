@@ -1,3 +1,5 @@
+[//]: # (Copyright © 2024 Perpetuator LLC)
+
 # Angular Material Icons
 
 - https://fonts.google.com/icons

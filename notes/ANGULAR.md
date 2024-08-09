@@ -1,3 +1,5 @@
+[//]: # (Copyright © 2024 Perpetuator LLC)
+
 # Development
 
 To generate new components:

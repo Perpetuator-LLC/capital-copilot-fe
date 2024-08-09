@@ -6,7 +6,7 @@ import { MatDivider } from '@angular/material/divider';
   selector: 'app-eula',
   standalone: true,
   imports: [MatCard, MatDivider, MatCardSubtitle, MatCardTitle, MatCardContent],
-  templateUrl: './eula.component.html',
-  styleUrl: './eula.component.scss',
+  templateUrl: './terms-and-conditions.component.html',
+  styleUrl: './terms-and-conditions.component.scss',
 })
-export class EulaComponent {}
+export class TermsAndConditionsComponent {}

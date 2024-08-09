@@ -47,6 +47,7 @@ export class LayoutComponent implements OnDestroy, OnInit {
   protected currentTheme: Theme;
   isLoggedIn = this.authService.isLoggedIn;
   private authRequiredRoutes = ['logout', 'charts', 'times', 'valuation'];
+  private loggedOutRoutes = ['login', 'register'];
 
   @ViewChild('toolbarContainer', { read: ViewContainerRef, static: true }) toolbarContainer!: ViewContainerRef;
 
@@ -67,7 +68,7 @@ export class LayoutComponent implements OnDestroy, OnInit {
   }
 
   shouldShow(item: Route): boolean {
-    if (item.path === 'login') {
+    if (item.path && this.loggedOutRoutes.includes(item.path)) {
       return !this.isLoggedIn();
     } else if (item.path && this.authRequiredRoutes.includes(item.path)) {
       return this.isLoggedIn();

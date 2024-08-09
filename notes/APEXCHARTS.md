@@ -1,4 +1,6 @@
-# APEXCHARTS
+[//]: # (Copyright © 2024 Perpetuator LLC)
+
+# ApexCharts
 
 ## Install
 

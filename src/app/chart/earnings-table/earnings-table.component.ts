@@ -12,13 +12,7 @@ import { ChartData, EarningsData } from '../../data.service';
   styleUrls: ['./earnings-table.component.scss'],
   standalone: true,
   providers: [DatePipe],
-  imports: [
-    MatTableModule,
-    MatTooltipModule,
-    MatExpansionModule,
-    CommonModule,
-    MatProgressSpinnerModule,
-  ],
+  imports: [MatTableModule, MatTooltipModule, MatExpansionModule, CommonModule, MatProgressSpinnerModule],
 })
 export class EarningsTableComponent implements OnChanges {
   @Input() dataSource: ChartData = {};
@@ -43,18 +37,8 @@ export class EarningsTableComponent implements OnChanges {
       rawData?.map((item) => {
         const reportDate = new Date(item.reportDate);
         const fiscalDateEnding = new Date(item.fiscalDateEnding);
-        const daysFromNow = Math.floor(
-          (reportDate.getTime() - currentDate.getTime()) /
-            (1000 * 60 * 60 * 24),
-        );
-        const color =
-          daysFromNow < 15
-            ? 'red'
-            : daysFromNow < 30
-              ? 'orange'
-              : daysFromNow < 45
-                ? 'yellow'
-                : 'green';
+        const daysFromNow = Math.floor((reportDate.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24));
+        const color = daysFromNow < 15 ? 'red' : daysFromNow < 30 ? 'orange' : daysFromNow < 45 ? 'yellow' : 'green';
 
         return {
           ...item,
