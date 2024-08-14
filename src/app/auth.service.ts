@@ -1,40 +1,19 @@
 import { Injectable, signal, WritableSignal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, of } from 'rxjs';
-import { tap, switchMap, catchError } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { catchError, switchMap, tap } from 'rxjs/operators';
+import { JWT, Token } from './types';
+import { decodeJWT } from './jwt';
 
-interface Token {
-  access: string;
-  refresh: string;
-  expires_in: number;
-}
-
-interface JWT {
-  exp: number;
-}
-
-// Utility function to decode JWT token
-function decodeJWT(token: string): JWT | null {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((c) => `%${('00' + c.charCodeAt(0).toString(16)).slice(-2)}`)
-        .join(''),
-    );
-    return JSON.parse(jsonPayload);
-  } catch (e) {
-    console.error('Failed to decode JWT:', e);
-    return null;
-  }
+export interface RegisterError {
+  messages: string[];
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+  private errors: string[] = [];
   private tokenUrl = 'http://127.0.0.1:8000/api/token/';
   private refreshTokenUrl = 'http://127.0.0.1:8000/api/token/refresh/';
   private registerUrl = 'http://127.0.0.1:8000/api/register/';
@@ -44,23 +23,36 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   login(username: string, password: string): Observable<Token | null> {
+    this.errors = [];
     return this.http.post<Token>(this.tokenUrl, { username, password }).pipe(
       tap((response) => this.setSession(response)),
       catchError((error) => {
         console.error('Login error:', error);
+        Object.keys(error.error).forEach((key) => {
+          this.errors.push(`Login ${key} error: ${error.error[key]}`);
+        });
         return of(null); // Ensuring that we always return an Observable of the same type
       }),
     );
   }
 
   register(username: string, email: string, password: string): Observable<Token | null> {
+    this.errors = [];
     return this.http.post<Token>(this.registerUrl, { username, email, password }).pipe(
       tap((response: Token) => this.setSession(response)),
       catchError((error) => {
-        console.error('Registration error:', error);
+        console.error('Registration error: ', error);
+        Object.keys(error.error).forEach((key) => {
+          this.errors.push(`Registration ${key} error: ${error.error[key]}`);
+        });
+        // this.errors.push('Registration error: ' + JSON.stringify(error.error, null, 2));
         return of(null);
       }),
     );
+  }
+
+  getErrors(): string[] {
+    return this.errors;
   }
 
   refreshToken(): Observable<Token | null> {
@@ -84,14 +76,14 @@ export class AuthService {
     const refreshToken = authResult.refresh;
 
     const decodedAccessToken: JWT | null = decodeJWT(accessToken);
-    if (!decodedAccessToken) {
+    if (decodedAccessToken === null || decodedAccessToken.exp === undefined) {
       console.error('Failed to decode access token');
       return;
     }
     const accessExpiresAt = decodedAccessToken.exp * 1000;
 
     const decodedRefreshToken: JWT | null = decodeJWT(refreshToken);
-    if (!decodedRefreshToken) {
+    if (decodedRefreshToken === null || decodedRefreshToken.exp === undefined) {
       console.error('Failed to decode refresh token');
       return;
     }
@@ -109,7 +101,7 @@ export class AuthService {
   private updateSession(authResult: Token) {
     const accessToken = authResult.access;
     const decodedAccessToken: JWT | null = decodeJWT(accessToken);
-    if (!decodedAccessToken) {
+    if (decodedAccessToken === null || decodedAccessToken.exp === undefined) {
       console.error('Failed to decode access token');
       return;
     }

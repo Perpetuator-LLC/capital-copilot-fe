@@ -4,7 +4,9 @@ import { Router } from '@angular/router';
 import { of } from 'rxjs';
 import { AuthService } from '../auth.service';
 import { LoginComponent } from './login.component';
-import {HttpClientTestingModule} from "@angular/common/http/testing";
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { createTestJWT } from '../jwt';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
@@ -17,13 +19,12 @@ describe('LoginComponent', () => {
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, LoginComponent, HttpClientTestingModule],
+      imports: [ReactiveFormsModule, LoginComponent, HttpClientTestingModule, NoopAnimationsModule],
       providers: [
         { provide: AuthService, useValue: authServiceSpy },
-        { provide: Router, useValue: routerSpy }
-      ]
-    })
-      .compileComponents();
+        { provide: Router, useValue: routerSpy },
+      ],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
@@ -37,8 +38,12 @@ describe('LoginComponent', () => {
   });
 
   it('should call AuthService login on form submit', () => {
-    authService.login.and.returnValue(of(true)); // Mock login to return an observable
-
+    authService.login.and.returnValue(
+      of({
+        access: createTestJWT({}),
+        refresh: createTestJWT({}, 3600 * 24),
+      }),
+    );
     component.loginForm.setValue({ username: 'testuser', password: 'testpassword' });
     component.onSubmit();
 

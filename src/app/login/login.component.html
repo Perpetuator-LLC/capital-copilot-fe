@@ -1,22 +1,47 @@
+<link rel="stylesheet" href="login.component.scss" />
 <div class="login-container">
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-    <mat-card>
+    <mat-card class="login-card">
       <mat-card-header>
         <mat-card-title>Login</mat-card-title>
       </mat-card-header>
       <mat-card-content>
         <mat-form-field appearance="fill">
           <mat-label>Username</mat-label>
-          <input matInput type="text" id="username" formControlName="username" autocomplete="username"/>
+          <input matInput type="text" id="username" formControlName="username" autocomplete="username" />
         </mat-form-field>
         <mat-form-field appearance="fill">
           <mat-label>Password</mat-label>
-          <input matInput type="password" id="password" formControlName="password" autocomplete="current-password"/>
+          <input matInput type="password" id="password" formControlName="password" autocomplete="current-password" />
         </mat-form-field>
       </mat-card-content>
       <mat-card-actions>
-        <button mat-raised-button color="primary" type="submit">Login</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="!loginForm.valid">Login</button>
       </mat-card-actions>
     </mat-card>
   </form>
+  @if (errors && errors.length > 0) {
+    <div class="error-container">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Register Errors</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-accordion multi>
+            <mat-expansion-panel expanded>
+              <mat-expansion-panel-header>
+                <mat-panel-title>Error Messages</mat-panel-title>
+              </mat-expansion-panel-header>
+              @for (error of errors; track error) {
+                <div class="error-message">
+                  <mat-icon color="warn">error</mat-icon>
+                  {{ error }}
+                </div>
+              }
+            </mat-expansion-panel>
+          </mat-accordion>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  }
 </div>

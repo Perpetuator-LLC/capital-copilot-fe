@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, OnDestroy, Output } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, OnDestroy, Output, ViewChild } from '@angular/core';
 import { ChartData, DataService } from '../../data.service';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CandlestickComponent } from '../candlestick/candlestick.component';
@@ -8,7 +8,7 @@ import { AutocompleteComponent } from '../../autocomplete/autocomplete.component
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
-  selector: 'app-chart-control',
+  selector: 'app-charts-control',
   standalone: true,
   imports: [CandlestickComponent, MatInput, AutocompleteComponent, ReactiveFormsModule],
   templateUrl: './control.component.html',
@@ -18,8 +18,8 @@ export class ControlComponent implements OnDestroy, AfterViewInit {
   // stockForm = new FormGroup({
   //   ticker: new FormControl('', Validators.required),
   // });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  @Output() dataEmitter = new EventEmitter<any>();
+  @ViewChild(AutocompleteComponent) autocomplete!: AutocompleteComponent;
+  @Output() dataEmitter = new EventEmitter<ChartData | null>();
   error: string | null = null;
   private subscription: Subscription | undefined;
 

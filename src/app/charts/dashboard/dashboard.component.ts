@@ -1,18 +1,18 @@
 import { Component, TemplateRef, ViewChild, OnDestroy, AfterViewInit } from '@angular/core';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../../auth.service';
 import { MatButton } from '@angular/material/button';
 import { MatBadge } from '@angular/material/badge';
-import { ChartData } from '../data.service';
-import { ControlComponent } from '../chart/control/control.component';
-import { EarningsTableComponent } from '../chart/earnings-table/earnings-table.component';
-import { CandlestickComponent } from '../chart/candlestick/candlestick.component';
-import { LayoutComponent } from '../layout/layout.component';
+import { ChartData } from '../../data.service';
+import { ControlComponent } from '../control/control.component';
+import { EarningsTableComponent } from '../earnings-table/earnings-table.component';
+import { CandlestickComponent } from '../candlestick/candlestick.component';
+import { LayoutComponent } from '../../layout/layout.component';
 import { NgTemplateOutlet } from '@angular/common';
-import { ToolbarService } from '../toolbar.service';
+import { ToolbarService } from '../../toolbar.service';
 import dataSource from './mock-data.json';
 
 @Component({
-  selector: 'app-landing',
+  selector: 'app-charts-dashboard',
   standalone: true,
   imports: [
     ControlComponent,
@@ -23,13 +23,13 @@ import dataSource from './mock-data.json';
     LayoutComponent,
     NgTemplateOutlet,
   ],
-  templateUrl: './landing.component.html',
-  styleUrls: ['./landing.component.scss'],
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss'],
 })
-export class LandingComponent implements AfterViewInit, OnDestroy {
+export class DashboardComponent implements AfterViewInit, OnDestroy {
   dataSource: ChartData = dataSource;
   isLoggedIn = this.authService.isLoggedIn;
-  @ViewChild('toolbarTemplate', { static: true }) toolbarTemplate!: TemplateRef<any>;
+  @ViewChild('toolbarTemplate', { static: true }) toolbarTemplate!: TemplateRef<never>;
 
   constructor(
     public authService: AuthService,

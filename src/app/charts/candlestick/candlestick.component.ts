@@ -49,7 +49,7 @@ export interface ChartOptions {
 
 @Component({
   imports: [NgApexchartsModule, JsonPipe, MatProgressSpinner],
-  selector: 'app-chart-candlestick',
+  selector: 'app-charts-candlestick',
   standalone: true,
   styleUrls: ['./candlestick.component.scss'],
   templateUrl: './candlestick.component.html',
@@ -73,7 +73,8 @@ export class CandlestickComponent implements OnChanges, AfterViewInit {
   public barVolumeOptions: ChartOptions;
   public squeezeChartOptions: ChartOptions;
 
-  // TODO: Volume on Price: https://codesandbox.io/s/apx-combo-multiple-yaxis-tz1yc?from-embed=&file=/src/app/app.component.ts
+  // TODO: Volume on Price...
+  //  https://codesandbox.io/s/apx-combo-multiple-yaxis-tz1yc?from-embed=&file=/src/app/app.component.ts
 
   constructor() {
     this.candlePriceOptions = {
@@ -101,14 +102,10 @@ export class CandlestickComponent implements OnChanges, AfterViewInit {
           dynamicAnimation: { enabled: true, speed: 30 },
         },
         events: {
-          click: (event, chartContext, config) => {
-            // console.debug('Chart Context:', chartContext);
-            // console.debug('Config:', config);
+          click: (event /*, chartContext, config*/) => {
             this.handleCandleClick(event);
           },
-          mounted: (chartContext, config) => {
-            // console.debug('Chart Context:', chartContext);
-            // console.debug('Config:', config);
+          mounted: (/*chartContext, config*/) => {
             this.resetZoom();
           },
         },
@@ -176,8 +173,7 @@ export class CandlestickComponent implements OnChanges, AfterViewInit {
         labels: {
           show: true,
           align: 'left',
-          formatter: function (val: number, opts?: never): string | string[] {
-            // console.debug('Opts:', opts);
+          formatter: function (val: number /*, opts?: never*/): string | string[] {
             return val.toFixed(2);
           },
         },
@@ -214,9 +210,7 @@ export class CandlestickComponent implements OnChanges, AfterViewInit {
           dynamicAnimation: { enabled: true, speed: 30 },
         },
         events: {
-          click: (event, chartContext, config) => {
-            // console.debug('Chart Context:', chartContext);
-            // console.debug('Config:', config);
+          click: (event /*, chartContext, config*/) => {
             this.handleVolumeClick(event);
           },
         },
@@ -263,9 +257,7 @@ export class CandlestickComponent implements OnChanges, AfterViewInit {
           dynamicAnimation: { enabled: true, speed: 30 },
         },
         events: {
-          click: (event, chartContext, config) => {
-            // console.debug('Chart Context:', chartContext);
-            // console.debug('Config:', config);
+          click: (event /*, chartContext, config*/) => {
             this.handleVolumeClick(event);
           },
         },
@@ -284,8 +276,7 @@ export class CandlestickComponent implements OnChanges, AfterViewInit {
         labels: {
           show: true,
           align: 'left',
-          formatter: function (val: number, opts?: never): string | string[] {
-            // console.debug('Opts:', opts);
+          formatter: function (val: number /*, opts?: never*/): string | string[] {
             return val.toFixed(2);
           },
         },

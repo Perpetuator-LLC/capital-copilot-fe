@@ -3,6 +3,10 @@
 @use 'sass:map';
 @use '@angular/material' as mat;
 
+// Import MD3 variables
+//@use '@angular/material/core/theming/palette' as matPalette;
+//@use '@angular/material/core/theming/palette-md' as mdPalette;
+
 // Plus imports for other components in your app.
 //@use 'invest-theme/m3-theme';
 
@@ -13,32 +17,38 @@
 
 $typography: (
   brand-family: 'roboto, sans-serif',
-  bold-weight: 900
+  bold-weight: 900,
 );
 
 // https://github.com/angular/components/blob/main/src/material/core/theming/prebuilt/cyan-orange.scss
-$dark-theme: mat.define-theme((
-  color: (
-    theme-type: dark,
-    primary: mat.$orange-palette,
-    tertiary: mat.$violet-palette,
-  ),
-  density: (
-    scale: 0,
+$dark-theme: mat.define-theme(
+  (
+    color: (
+      theme-type: dark,
+      primary: mat.$orange-palette,
+      tertiary: mat.$violet-palette,
+      //use-system-variables: true
+    ),
+    density: (
+      scale: 0,
+    ),
   )
-));
+);
 
 // https://github.com/angular/components/blob/main/src/material/core/theming/prebuilt/azure-blue.scss
-$light-theme: mat.define-theme((
-  color: (
-    theme-type: light,
-    primary: mat.$azure-palette,
-    tertiary: mat.$blue-palette,
-  ),
-  density: (
-    scale: 0,
+$light-theme: mat.define-theme(
+  (
+    color: (
+      theme-type: light,
+      primary: mat.$azure-palette,
+      tertiary: mat.$blue-palette,
+      //use-system-variables: true
+    ),
+    density: (
+      scale: 0,
+    ),
   )
-));
+);
 
 @include mat.all-component-typographies($typography);
 
@@ -54,5 +64,14 @@ body.light {
   @include mat.all-component-themes($light-theme);
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
+:root {
+  --md-sys-color-error: #df4646; // Example color
+}

@@ -1,14 +1,23 @@
 # Capital Copilot Front-End
 
-- [ ] Check-in these changes, review, etc.
+- [x] Check-in these changes, review, etc.
+- [ ] Finish switching all GQL calls to Apollo
+- [ ] Get pre-commit stuff working, with 90% coverage, formatting, copyrights, etc.
+  - [ ] Add changelog script
+  - [ ] Add copyright check script
+- [ ] Add a storaged for the user to accept the terms and privacy policy
+- [ ] Remove jest if possible
 - [ ] Then add posthog
-- [ ] Create existing user error is not displayed
-- [ ] Format register
-- [ ] Add link to terms and pirvacy policy
+- [x] Create existing user error is not displayed
+- [x] Create user with existing email is allowed, need to block
+- [x] Format register
+- [x] Add link to terms and privacy policy
 - [ ] Add checkmark to record if they accept on account create
 - [ ] Delete user and make sure the API stops working
-- [ ] Add env support, and switch testing users to come from env
+- [x] Add env support, and switch testing users to come from env
 - [ ] Verify email before access
+- [ ] Switch to new inject syntax
+- [x] On landing but login required add a next query param to redirect to after login
 
 [ANGULAR.md](notes%2FANGULAR.md)
 [APEXCHARTS.md](notes%2FAPEXCHARTS.md)
@@ -25,7 +34,7 @@
   - [x] Setting Up Squeeze Indicator
   - [x] ATR Indicator 1x, 2x, 3x
 - [x] Earnings
-- [ ] Sector, Subsector, Indexes, ETFs
+- [ ] Sector, Sub-sector/Industry, Indexes, ETFs
 - [ ] Multi-time Frame Squeeze
 - [ ] Option Spread Alerts
   - [ ] Option price over time as chart (bid, ask, mid)

@@ -7,7 +7,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ChartData, EarningsData } from '../../data.service';
 
 @Component({
-  selector: 'app-chart-earnings-table',
+  selector: 'app-charts-earnings-table',
   templateUrl: './earnings-table.component.html',
   styleUrls: ['./earnings-table.component.scss'],
   standalone: true,

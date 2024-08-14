@@ -1,14 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 import { HTTP_INTERCEPTORS, HttpClient } from '@angular/common/http';
-import {
-  HttpTestingController,
-  HttpClientTestingModule,
-} from '@angular/common/http/testing';
+import { HttpTestingController, HttpClientTestingModule } from '@angular/common/http/testing';
 import { AuthInterceptorService } from './auth-interceptor.service';
 import { AuthService } from './auth.service';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
+
+import { createTestJWT } from './jwt';
 
 describe('AuthInterceptorService', () => {
   let httpMock: HttpTestingController;
@@ -41,7 +40,9 @@ describe('AuthInterceptorService', () => {
   });
 
   it('should add an Authorization header', () => {
-    const mockToken = 'mock-token';
+    const mockToken = createTestJWT({}, 3600);
+
+    spyOn(authService, 'isRefreshTokenExpired').and.returnValue(false);
     spyOn(authService, 'getTokenObservable').and.returnValue(of(mockToken));
 
     httpClient.get('/test').subscribe();
@@ -49,9 +50,7 @@ describe('AuthInterceptorService', () => {
     const httpRequest = httpMock.expectOne('/test');
 
     expect(httpRequest.request.headers.has('Authorization')).toBeTruthy();
-    expect(httpRequest.request.headers.get('Authorization')).toBe(
-      `Bearer ${mockToken}`,
-    );
+    expect(httpRequest.request.headers.get('Authorization')).toBe(`Bearer ${mockToken}`);
   });
 
   it('should not add an Authorization header if the token is not available', () => {

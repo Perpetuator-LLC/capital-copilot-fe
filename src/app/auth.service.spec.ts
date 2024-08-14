@@ -1,30 +1,8 @@
 import { TestBed } from '@angular/core/testing';
-import {
-  HttpClientTestingModule,
-  HttpTestingController,
-} from '@angular/common/http/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { AuthService } from './auth.service';
 
-interface JWT {
-  exp?: number;
-  iat?: number;
-}
-
-function createTestJWT(payload: JWT, expiresIn = 3600): string {
-  const header = {
-    alg: 'HS256',
-    typ: 'JWT',
-  };
-  const encodedHeader = btoa(JSON.stringify(header));
-  const iat = Math.floor(Date.now() / 1000);
-  payload.iat = payload.iat || iat;
-  payload.exp = payload.exp || iat + expiresIn; // Default expiry: 1 hour
-  const encodedPayload = btoa(JSON.stringify(payload));
-
-  // Typically a real JWT would be signed, but for testing we can just concatenate
-  // the parts with a fake signature
-  return `${encodedHeader}.${encodedPayload}.fake-signature`;
-}
+import { createTestJWT } from './jwt';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -73,12 +51,15 @@ describe('AuthService', () => {
     const token = createTestJWT({});
     const mockResponse = {
       access: token,
+      refresh: createTestJWT({}, 3600 * 24),
       expires_in: 3600,
     };
 
     spyOn(localStorage, 'getItem').and.callFake((key: string) => {
       if (key === 'refresh_token') {
-        return 'refresh-token';
+        return mockResponse.refresh;
+      } else if (key === 'refresh_expires_at') {
+        return JSON.stringify(mockResponse.expires_in * 1000);
       }
       return null;
     });
@@ -87,14 +68,8 @@ describe('AuthService', () => {
 
     service.refreshToken().subscribe((response) => {
       expect(response).toEqual(mockResponse);
-      expect(localStorage.setItem).toHaveBeenCalledWith(
-        'id_token',
-        mockResponse.access,
-      );
-      expect(localStorage.setItem).toHaveBeenCalledWith(
-        'expires_at',
-        jasmine.any(String),
-      );
+      expect(localStorage.setItem).toHaveBeenCalledWith('id_token', mockResponse.access);
+      expect(localStorage.setItem).toHaveBeenCalledWith('expires_at', jasmine.any(String));
     });
 
     const req = httpMock.expectOne(service['refreshTokenUrl']);
@@ -105,10 +80,7 @@ describe('AuthService', () => {
   it('should logout and clear session', () => {
     localStorage.setItem('id_token', 'access-token');
     localStorage.setItem('refresh_token', 'refresh-token');
-    localStorage.setItem(
-      'expires_at',
-      JSON.stringify(new Date().getTime() + 3600 * 1000),
-    );
+    localStorage.setItem('expires_at', JSON.stringify(new Date().getTime() + 3600 * 1000));
 
     service.logout();
 
@@ -118,19 +90,14 @@ describe('AuthService', () => {
   });
 
   it('should return true if the user is logged in', () => {
-    localStorage.setItem(
-      'expires_at',
-      JSON.stringify(new Date().getTime() + 3600 * 1000),
-    );
+    //spyOn(localStorage, 'refresh_expires_at').and.returnValue(of(JSON.stringify(new Date().getTime() + 3600 * 1000)));
+    localStorage.setItem('refresh_expires_at', JSON.stringify(new Date().getTime() + 3600 * 1000));
 
     expect(service.isLoggedIn()).toBeTrue();
   });
 
   it('should return false if the user is not logged in', () => {
-    localStorage.setItem(
-      'expires_at',
-      JSON.stringify(new Date().getTime() - 3600 * 1000),
-    );
+    localStorage.setItem('refresh_expires_at', JSON.stringify(new Date().getTime() - 3600 * 1000));
 
     expect(service.isLoggedIn()).toBeFalse();
   });

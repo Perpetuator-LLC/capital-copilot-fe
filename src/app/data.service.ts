@@ -5,7 +5,7 @@ import { catchError, map } from 'rxjs/operators';
 
 export interface ChartData {
   success?: boolean;
-  data?: { loading: boolean; error: string };
+  data?: { loading?: boolean; error?: string };
   message?: string;
   ohlc?: OHLC[];
   volume?: Volume[];
@@ -110,9 +110,7 @@ export class DataService {
       }),
       catchError((error) => {
         console.error('GraphQL query error:', error);
-        return throwError(
-          () => new Error('Failed to fetch chart data: ' + error.message),
-        );
+        return throwError(() => new Error('Failed to fetch chart data: ' + error.message));
       }),
     );
   }

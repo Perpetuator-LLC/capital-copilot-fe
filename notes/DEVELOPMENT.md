@@ -14,8 +14,8 @@ development, but you must be able to run any code generation or manipulation fro
 Update version in pyproject.toml.
 
 ```shell
-sed -i '' 's/^version = ".*"/version = "50.1.0"/' ./pyproject.toml
-grep '^version = ' ./pyproject.toml
+sed -i '' 's/^version = ".*"/version = "50.1.0"/' ./package.json
+grep '^version = ' ./package.json
 ```
 
 Update the changelog:

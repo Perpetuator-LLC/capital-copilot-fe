@@ -1,5 +1,24 @@
+mat-card {
+  margin: 2rem auto;
+  padding: 20px;
+}
+
+mat-card.login-card {
+  max-width: 400px;
+}
+
+mat-error {
+  font-size: 0.8em;
+  color: var(--md-sys-color-error);
+}
+
+mat-form-field {
+  width: 100%;
+}
+
 .login-container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 100vh;
@@ -7,7 +26,17 @@
   filter: brightness(150%);
 }
 
-mat-card {
-  width: 400px;
-  padding: 20px;
+.error-container {
+  min-width: 300px;
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  color: var(--md-sys-color-error);
+  margin: 10px 0;
+}
+
+mat-icon {
+  margin-right: 8px;
 }

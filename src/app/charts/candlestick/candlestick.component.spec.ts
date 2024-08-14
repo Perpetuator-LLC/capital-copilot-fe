@@ -48,13 +48,9 @@ describe('CandlestickGraphComponent', () => {
     });
 
     expect(component.candlePriceOptions.series.length).toBe(1);
-    expect(component.candlePriceOptions.series[0].data).toEqual(
-      dataSource.ohlc,
-    );
+    expect(component.candlePriceOptions.series[0].data).toEqual(dataSource.ohlc);
     expect(component.barVolumeOptions.series.length).toBe(1);
-    expect(component.barVolumeOptions.series[0].data).toEqual(
-      dataSource.volume,
-    );
+    expect(component.barVolumeOptions.series[0].data).toEqual(dataSource.volume);
   });
 
   it('should set date range correctly', () => {

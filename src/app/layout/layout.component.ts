@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ViewChild, OnDestroy, ViewContainerRef, ComponentRef } from '@angular/core';
+import { Component, inject, OnInit, ViewChild, OnDestroy, ViewContainerRef } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -15,8 +15,9 @@ import { AuthService } from '../auth.service';
 import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-toggle';
 import { FormsModule } from '@angular/forms';
 import { CookieBannerComponent } from '../cookie-banner/cookie-banner.component';
-import { ControlComponent } from '../chart/control/control.component';
+import { ControlComponent } from '../charts/control/control.component';
 import { ToolbarService } from '../toolbar.service';
+import { AuthGuard } from '../auth.guard';
 
 @Component({
   selector: 'app-layout',
@@ -46,8 +47,8 @@ export class LayoutComponent implements OnDestroy, OnInit {
   private breakpointObserver = inject(BreakpointObserver);
   protected currentTheme: Theme;
   isLoggedIn = this.authService.isLoggedIn;
-  private authRequiredRoutes = ['logout', 'charts', 'times', 'valuation'];
-  private loggedOutRoutes = ['login', 'register'];
+  private authRequiredRoutes = AuthGuard.getAuthRequiredRoutes();
+  private loggedOutRoutes = AuthGuard.getLoggedOutRoutes();
 
   @ViewChild('toolbarContainer', { read: ViewContainerRef, static: true }) toolbarContainer!: ViewContainerRef;
 

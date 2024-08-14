@@ -1,0 +1,11 @@
+<ng-template #toolbarTemplate>
+  @if (isLoggedIn()) {
+    <app-charts-control (dataEmitter)="handleData($event)"></app-charts-control>
+  }
+</ng-template>
+@if (isLoggedIn()) {
+  <app-charts-earnings-table [dataSource]="dataSource"></app-charts-earnings-table>
+  <app-charts-candlestick [dataSource]="dataSource"></app-charts-candlestick>
+} @else {
+  <p>Please login to use the app.</p>
+}

@@ -1,30 +1,25 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { LandingComponent } from './landing.component';
-import { AuthService } from '../auth.service';
+import { DashboardComponent } from './dashboard.component';
+import { AuthService } from '../../auth.service';
 import { By } from '@angular/platform-browser';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ChartComponent } from 'ng-apexcharts';
-import { CandlestickComponent } from '../chart/candlestick/candlestick.component';
+import { CandlestickComponent } from '../candlestick/candlestick.component';
 
 describe('LandingComponent', () => {
-  let component: LandingComponent;
-  let fixture: ComponentFixture<LandingComponent>;
+  let component: DashboardComponent;
+  let fixture: ComponentFixture<DashboardComponent>;
   let authService: jasmine.SpyObj<AuthService>;
 
   beforeEach(async () => {
     const authServiceSpy = jasmine.createSpyObj('AuthService', ['isLoggedIn']);
 
     await TestBed.configureTestingModule({
-      imports: [
-        ChartComponent,
-        CandlestickComponent,
-        LandingComponent,
-        HttpClientTestingModule,
-      ],
+      imports: [ChartComponent, CandlestickComponent, DashboardComponent, HttpClientTestingModule],
       providers: [{ provide: AuthService, useValue: authServiceSpy }],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(LandingComponent);
+    fixture = TestBed.createComponent(DashboardComponent);
     component = fixture.componentInstance;
     authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
     fixture.detectChanges();
@@ -46,12 +41,8 @@ describe('LandingComponent', () => {
     authService.isLoggedIn.and.returnValue(true);
     fixture.detectChanges();
 
-    const chartComponent = fixture.debugElement.query(
-      By.directive(ChartComponent),
-    );
-    const candlestickGraphComponent = fixture.debugElement.query(
-      By.directive(CandlestickComponent),
-    );
+    const chartComponent = fixture.debugElement.query(By.directive(ChartComponent));
+    const candlestickGraphComponent = fixture.debugElement.query(By.directive(CandlestickComponent));
 
     expect(chartComponent).toBeTruthy();
     expect(candlestickGraphComponent).toBeTruthy();
@@ -61,9 +52,7 @@ describe('LandingComponent', () => {
     authService.isLoggedIn.and.returnValue(true);
     fixture.detectChanges();
 
-    const chartComponent = fixture.debugElement.query(
-      By.directive(ChartComponent),
-    );
+    const chartComponent = fixture.debugElement.query(By.directive(ChartComponent));
     const testData = { ticker: 'value' };
 
     chartComponent.triggerEventHandler('dataEmitter', testData);
@@ -77,9 +66,7 @@ describe('LandingComponent', () => {
     authService.isLoggedIn.and.returnValue(true);
     fixture.detectChanges();
 
-    const chartComponent = fixture.debugElement.query(
-      By.directive(ChartComponent),
-    );
+    const chartComponent = fixture.debugElement.query(By.directive(ChartComponent));
     const testData = { ticker: 'value' };
 
     chartComponent.triggerEventHandler('dataEmitter', testData);

@@ -1,7 +1,7 @@
 @if (dataSource.data?.loading) {
   <div>
+    <div class="loading-indicator"><mat-spinner></mat-spinner><br /></div>
     <div class="loading-indicator">
-      <mat-spinner></mat-spinner><br/>
       <p>Loading data, please wait...</p>
     </div>
   </div>
@@ -85,7 +85,7 @@
         [legend]="scrollbarOptions.legend"
         [grid]="scrollbarOptions.grid"
       ></apx-chart>
-    <!--  <div>Data: { { dataSource | json }}</div>-->
+      <!--  <div>Data: { { dataSource | json }}</div>-->
     </div>
   </div>
 }

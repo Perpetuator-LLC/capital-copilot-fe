@@ -77,14 +77,18 @@ export class AutocompleteComponent {
     }
 
     // const filterValue = this.input.nativeElement.value.toLowerCase();
-    return this.apollo
-      .query({
-        query: AUTOCOMPLETE_QUERY,
-        variables: { query: value },
-      })
-      .pipe(map((result: any) => result.data.getAutocomplete.results));
+    return (
+      this.apollo
+        .query({
+          query: AUTOCOMPLETE_QUERY,
+          variables: { query: value },
+        })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .pipe(map((result: any) => result.data.getAutocomplete.results))
+    );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onOptionSelected(event: any) {
     this.optionSelected.emit(event.option.value);
   }
@@ -104,6 +108,7 @@ export class AutocompleteComponent {
             this.enterPressed.emit(); // Handle selection with enter
           } else {
             this.valueSubmitted.emit(inputValue); // Handle input with enter
+            this.tickerControl.setValue(''); // Clear the input field
           }
         });
     }
