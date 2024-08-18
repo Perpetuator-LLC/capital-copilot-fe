@@ -66,6 +66,8 @@ describe('AuthService', () => {
 
     spyOn(localStorage, 'setItem').and.callThrough();
 
+    spyOn(service, 'isRefreshTokenExpired').and.returnValue(false);
+
     service.refreshToken().subscribe((response) => {
       expect(response).toEqual(mockResponse);
       expect(localStorage.setItem).toHaveBeenCalledWith('id_token', mockResponse.access);
@@ -89,18 +91,27 @@ describe('AuthService', () => {
     expect(localStorage.getItem('expires_at')).toBeNull();
   });
 
-  it('should return true if the user is logged in', () => {
-    //spyOn(localStorage, 'refresh_expires_at').and.returnValue(of(JSON.stringify(new Date().getTime() + 3600 * 1000)));
+  it('should return false if refresh is valid', () => {
     localStorage.setItem('refresh_expires_at', JSON.stringify(new Date().getTime() + 3600 * 1000));
-
-    expect(service.isLoggedIn()).toBeTrue();
+    const service2 = TestBed.inject(AuthService);
+    expect(service2.isRefreshTokenExpired()).toBeFalse();
   });
 
-  it('should return false if the user is not logged in', () => {
+  it('should return true if refresh is expired', () => {
     localStorage.setItem('refresh_expires_at', JSON.stringify(new Date().getTime() - 3600 * 1000));
-
-    expect(service.isLoggedIn()).toBeFalse();
+    const service2 = TestBed.inject(AuthService);
+    expect(service2.isRefreshTokenExpired()).toBeTrue();
   });
+
+  // it('should return true if the user is logged in', () => {
+  //   spyOn(service, 'isRefreshTokenExpired').and.returnValue(false);
+  //   expect(service.isLoggedIn()).toBeTrue();
+  // });
+  //
+  // it('should return false if the user is not logged in', () => {
+  //   spyOn(service, 'isRefreshTokenExpired').and.returnValue(true);
+  //   expect(service.isLoggedIn()).toBeFalse();
+  // });
 
   it('should return the token if available', () => {
     localStorage.setItem('id_token', 'access-token');

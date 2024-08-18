@@ -15,7 +15,7 @@ describe('LoginComponent', () => {
   let router: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
-    const authServiceSpy = jasmine.createSpyObj('AuthService', ['login']);
+    const authServiceSpy = jasmine.createSpyObj('AuthService', ['login', 'getErrors']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
@@ -38,6 +38,7 @@ describe('LoginComponent', () => {
   });
 
   it('should call AuthService login on form submit', () => {
+    authService.getErrors.and.returnValue([]);
     authService.login.and.returnValue(
       of({
         access: createTestJWT({}),

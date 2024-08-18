@@ -19,7 +19,7 @@ export class ControlComponent implements OnDestroy, AfterViewInit {
   //   ticker: new FormControl('', Validators.required),
   // });
   @ViewChild(AutocompleteComponent) autocomplete!: AutocompleteComponent;
-  @Output() dataEmitter = new EventEmitter<ChartData | null>();
+  @Output() dataEmitter = new EventEmitter<ChartData>();
   error: string | null = null;
   private subscription: Subscription | undefined;
 
@@ -57,7 +57,7 @@ export class ControlComponent implements OnDestroy, AfterViewInit {
     // }
     this.dataEmitter.emit({ ticker: ticker, data: { loading: true } });
     this.subscription = this.dataService.fetchData(ticker).subscribe({
-      next: (data: ChartData | null) => {
+      next: (data: ChartData) => {
         this.dataEmitter.emit(data);
       },
       error: (err: { message: string }) => {

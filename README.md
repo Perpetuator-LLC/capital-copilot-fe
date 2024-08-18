@@ -1,11 +1,12 @@
 # Capital Copilot Front-End
 
 - [x] Check-in these changes, review, etc.
-- [ ] Finish switching all GQL calls to Apollo
 - [ ] Get pre-commit stuff working, with 90% coverage, formatting, copyrights, etc.
   - [ ] Add changelog script
   - [ ] Add copyright check script
-- [ ] Add a storaged for the user to accept the terms and privacy policy
+- [ ] Edit user info
+- [ ] Finish switching all GQL calls to Apollo
+- [ ] Add a stored value for the user to accept the terms and privacy policy
 - [ ] Remove jest if possible
 - [ ] Then add posthog
 - [x] Create existing user error is not displayed

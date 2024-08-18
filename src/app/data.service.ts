@@ -59,9 +59,9 @@ export class DataService {
 
   constructor(private http: HttpClient) {}
 
-  fetchData(ticker: string | null | undefined): Observable<ChartData | null> {
-    if (!ticker) {
-      return of(null); // Return an Observable emitting `null` if no ticker
+  fetchData(ticker: string | null | undefined): Observable<ChartData> {
+    if (ticker === null || ticker === undefined) {
+      return of({});
     }
     const query = {
       query: `{

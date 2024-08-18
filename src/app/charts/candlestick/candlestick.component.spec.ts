@@ -47,7 +47,7 @@ describe('CandlestickGraphComponent', () => {
       },
     });
 
-    expect(component.candlePriceOptions.series.length).toBe(1);
+    expect(component.candlePriceOptions.series.length).toBe(8); // Price + 7 indicators
     expect(component.candlePriceOptions.series[0].data).toEqual(dataSource.ohlc);
     expect(component.barVolumeOptions.series.length).toBe(1);
     expect(component.barVolumeOptions.series[0].data).toEqual(dataSource.volume);

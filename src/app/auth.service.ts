@@ -29,7 +29,7 @@ export class AuthService {
       catchError((error) => {
         console.error('Login error:', error);
         Object.keys(error.error).forEach((key) => {
-          this.errors.push(`Login ${key} error: ${error.error[key]}`);
+          this.errors.push(`Login error (${key}): ${error.error[key]}`);
         });
         return of(null); // Ensuring that we always return an Observable of the same type
       }),
@@ -43,7 +43,7 @@ export class AuthService {
       catchError((error) => {
         console.error('Registration error: ', error);
         Object.keys(error.error).forEach((key) => {
-          this.errors.push(`Registration ${key} error: ${error.error[key]}`);
+          this.errors.push(`Registration error (${key}): ${error.error[key]}`);
         });
         // this.errors.push('Registration error: ' + JSON.stringify(error.error, null, 2));
         return of(null);

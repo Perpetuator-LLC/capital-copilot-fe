@@ -54,6 +54,7 @@ describe('AuthInterceptorService', () => {
   });
 
   it('should not add an Authorization header if the token is not available', () => {
+    spyOn(authService, 'isRefreshTokenExpired').and.returnValue(false);
     spyOn(authService, 'getTokenObservable').and.returnValue(of(null));
 
     httpClient.get('/test').subscribe();

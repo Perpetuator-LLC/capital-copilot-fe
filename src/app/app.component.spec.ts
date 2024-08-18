@@ -5,18 +5,16 @@ import { AuthService } from './auth.service';
 import { RouterTestingModule } from '@angular/router/testing';
 import { By } from '@angular/platform-browser';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('AppComponent', () => {
   let authService: jasmine.SpyObj<AuthService>;
 
   beforeEach(async () => {
-    const authServiceSpy = jasmine.createSpyObj('AuthService', [
-      'isLoggedIn',
-      'logout',
-    ]);
+    const authServiceSpy = jasmine.createSpyObj('AuthService', ['isLoggedIn', 'logout']);
 
     await TestBed.configureTestingModule({
-      imports: [AppComponent, HttpClientTestingModule, RouterTestingModule],
+      imports: [AppComponent, HttpClientTestingModule, RouterTestingModule, NoopAnimationsModule],
       providers: [{ provide: AuthService, useValue: authServiceSpy }],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -48,9 +46,7 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(
-      compiled.querySelector('nav a[routerLink="/login"]')?.textContent,
-    ).toContain('Login');
+    expect(compiled.querySelector('nav a[routerLink="/login"]')?.textContent).toContain('Login');
   });
 
   it('should render logout button when logged in', () => {

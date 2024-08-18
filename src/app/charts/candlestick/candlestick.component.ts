@@ -32,6 +32,7 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 export interface ChartOptions {
   title: ApexTitleSubtitle;
+
   series: ApexAxisChartSeries;
   chart: ApexChart;
   xaxis: ApexXAxis;
