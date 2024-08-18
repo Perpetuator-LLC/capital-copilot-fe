@@ -1,104 +1,88 @@
 <app-cookie-banner></app-cookie-banner>
 <mat-sidenav-container class="sidenav-container">
-  <mat-sidenav #drawer class="sidenav" fixedInViewport
-      [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
-      [mode]="(isHandset$ | async) ? 'over' : 'side'"
-      [opened]="(isHandset$ | async) === false">
+  <mat-sidenav
+    #drawer
+    class="sidenav"
+    fixedInViewport
+    [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+    [mode]="(isHandset$ | async) ? 'over' : 'side'"
+    [opened]="(isHandset$ | async) === false"
+  >
     <mat-toolbar>
-      <button
-        type="button"
-        aria-label="Collapse sidenav"
-        mat-icon-button
-        (click)="drawer.toggle()">
+      <button type="button" aria-label="Collapse sidenav" mat-icon-button (click)="drawer.toggle()">
         <mat-icon aria-label="Collapse nav icon">menu_open</mat-icon>
         Capital Copilot
       </button>
     </mat-toolbar>
     <mat-nav-list>
-<!--      Add buttons...-->
-<!--      @if ((isHandset$ | async) === false && !drawer.opened) {-->
-<!--          @for (item of rootRoutes; track item.path) {-->
-<!--            @if (shouldShow(item)) {-->
-<!--              <button-->
-<!--                type="button"-->
-<!--                aria-label="A menu button (add title?)"-->
-<!--                mat-icon-button-->
-<!--                [routerLink]="item.path"-->
-<!--                #link="routerLinkActive"-->
-<!--                routerLinkActive-->
-<!--              >-->
-<!--                <mat-icon>menu_open</mat-icon>-->
-<!--              </button>-->
-<!--            }-->
-<!--          }-->
-<!--          @if (this.authService.isLoggedIn()) {-->
-<!--            <a-->
-<!--              mat-list-item-->
-<!--              tabindex="0"-->
-<!--              (click)="logout()"-->
-<!--              (keydown.enter)="logout()"-->
-<!--              (keydown.space)="logout()">-->
-<!--              Logout-->
-<!--            </a>-->
-<!--          }-->
-<!--      } @else {-->
-        @for (item of rootRoutes; track item.path) {
-          @if (shouldShow(item)) {
-            <a
-              mat-list-item
-              [routerLink]="item.path"
-              #link="routerLinkActive"
-              routerLinkActive
-              [activated]="link.isActive"
-            >
-              {{ item.title }}
-            </a>
-          }
-        }
-        @if (this.authService.isLoggedIn()) {
+      <!--      Add buttons...-->
+      <!--      @if ((isHandset$ | async) === false && !drawer.opened) {-->
+      <!--          @for (item of rootRoutes; track item.path) {-->
+      <!--            @if (shouldShow(item)) {-->
+      <!--              <button-->
+      <!--                type="button"-->
+      <!--                aria-label="A menu button (add title?)"-->
+      <!--                mat-icon-button-->
+      <!--                [routerLink]="item.path"-->
+      <!--                #link="routerLinkActive"-->
+      <!--                routerLinkActive-->
+      <!--              >-->
+      <!--                <mat-icon>menu_open</mat-icon>-->
+      <!--              </button>-->
+      <!--            }-->
+      <!--          }-->
+      <!--          @if (this.authService.isLoggedIn()) {-->
+      <!--            <a-->
+      <!--              mat-list-item-->
+      <!--              tabindex="0"-->
+      <!--              (click)="logout()"-->
+      <!--              (keydown.enter)="logout()"-->
+      <!--              (keydown.space)="logout()">-->
+      <!--              Logout-->
+      <!--            </a>-->
+      <!--          }-->
+      <!--      } @else {-->
+      @for (item of rootRoutes; track item.path) {
+        @if (shouldShow(item)) {
           <a
             mat-list-item
-            tabindex="0"
-            (click)="logout()"
-            (keydown.enter)="logout()"
-            (keydown.space)="logout()">
-            Logout
+            [routerLink]="item.path"
+            #link="routerLinkActive"
+            routerLinkActive
+            [activated]="link.isActive"
+          >
+            {{ item.title }}
           </a>
         }
-        <mat-button-toggle-group #group="matButtonToggleGroup" [(ngModel)]="currentTheme" (change)="switchTheme(group.value)" aria-label="Theme Toggle">
-          <mat-button-toggle value="dark">
-            <mat-icon>dark_mode</mat-icon>
-          </mat-button-toggle>
-          <mat-button-toggle value="light">
-            <mat-icon>light_mode</mat-icon>
-          </mat-button-toggle>
-        </mat-button-toggle-group>
-        <a
-          mat-list-item
-          tabindex="0"
-          target="_blank"
-          href="privacy-policy.html">
-          Privacy Policy
+      }
+      @if (this.authService.isLoggedIn()) {
+        <a mat-list-item tabindex="0" (click)="logout()" (keydown.enter)="logout()" (keydown.space)="logout()">
+          Logout
         </a>
-        <a
-          mat-list-item
-          tabindex="0"
-          target="_blank"
-          href="terms-and-conditions.html">
-          Terms and Conditions
-        </a>
-<!--      }-->
+      }
+      <mat-button-toggle-group
+        #group="matButtonToggleGroup"
+        [(ngModel)]="currentTheme"
+        (change)="switchTheme(group.value)"
+        aria-label="Theme Toggle"
+      >
+        <mat-button-toggle value="dark">
+          <mat-icon>dark_mode</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="light">
+          <mat-icon>light_mode</mat-icon>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+      <a mat-list-item tabindex="0" target="_blank" href="privacy-policy.html"> Privacy Policy </a>
+      <a mat-list-item tabindex="0" target="_blank" href="terms-and-conditions.html"> Terms and Conditions </a>
+      <!--      }-->
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
     <mat-toolbar color="primary">
       @if (!drawer.opened) {
-        <button
-          type="button"
-          aria-label="Toggle sidenav"
-          mat-icon-button
-          (click)="drawer.toggle()">
-          <img src="Capital_Copilot_Logo_Slanted.png" aria-label="Side nav toggle icon" alt="Capital Copilot">
+        <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()">
+          <img src="Capital_Copilot_Logo_Slanted.png" aria-label="Side nav toggle icon" alt="Capital Copilot" />
         </button>
       }
       <ng-container #toolbarContainer></ng-container>
@@ -108,5 +92,15 @@
         <ng-content></ng-content>
       </div>
     </div>
+    <!--    <mat-footer-row>-->
+    <!--      <mat-footer-cell>-->
+    <p>
+      &copy; 2024 Perpetuator LLC. - By using Capitol Copilot AI, you agree to our
+      <a tabindex="0" target="_blank" href="terms-and-conditions.html"> Terms and Conditions </a>
+      and
+      <a tabindex="0" target="_blank" href="privacy-policy.html"> Privacy Policy </a>
+    </p>
+    <!--      </mat-footer-cell>-->
+    <!--    </mat-footer-row>-->
   </mat-sidenav-content>
 </mat-sidenav-container>

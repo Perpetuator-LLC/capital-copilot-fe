@@ -18,6 +18,7 @@ import { CookieBannerComponent } from '../cookie-banner/cookie-banner.component'
 import { ControlComponent } from '../charts/control/control.component';
 import { ToolbarService } from '../toolbar.service';
 import { AuthGuard } from '../auth.guard';
+import { MatFooterCell, MatFooterRow } from '@angular/material/table';
 
 @Component({
   selector: 'app-layout',
@@ -39,6 +40,8 @@ import { AuthGuard } from '../auth.guard';
     CookieBannerComponent,
     NgTemplateOutlet,
     ControlComponent,
+    MatFooterRow,
+    MatFooterCell,
   ],
 })
 export class LayoutComponent implements OnDestroy, OnInit {

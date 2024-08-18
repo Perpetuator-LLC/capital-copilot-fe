@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { AfterViewInit, Component, TemplateRef, ViewChild } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -14,6 +14,7 @@ import {
   MatExpansionPanelTitle,
 } from '@angular/material/expansion';
 import { MatIcon } from '@angular/material/icon';
+import { ToolbarService } from '../toolbar.service';
 
 @Component({
   selector: 'app-login',
@@ -38,18 +39,26 @@ import { MatIcon } from '@angular/material/icon';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent {
+export class LoginComponent implements AfterViewInit {
   errors: string[] = [];
   loginForm = new FormGroup({
     // TODO: Add validation equivalent to back-end
-    password: new FormControl(environment.TEST_PASSWORD ?? '', [Validators.required, Validators.minLength(6)]),
+    password: new FormControl(environment.TEST_PASSWORD ?? '', [Validators.required, Validators.minLength(5)]),
     username: new FormControl(environment.TEST_USERNAME ?? '', [Validators.required, Validators.minLength(2)]),
   });
+  @ViewChild('toolbarTemplate', { static: true }) toolbarTemplate!: TemplateRef<never>;
 
   constructor(
     private authService: AuthService,
     private router: Router,
+    private toolbarService: ToolbarService,
   ) {}
+
+  ngAfterViewInit() {
+    const viewContainerRef = this.toolbarService.getViewContainerRef();
+    viewContainerRef.clear();
+    viewContainerRef.createEmbeddedView(this.toolbarTemplate);
+  }
 
   onSubmit() {
     this.errors = [];

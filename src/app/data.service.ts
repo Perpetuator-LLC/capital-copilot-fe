@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { Apollo, gql } from 'apollo-angular';
 
 export interface ChartData {
   success?: boolean;
@@ -55,94 +55,85 @@ export interface ChartDataResponse {
   providedIn: 'root',
 })
 export class DataService {
-  private url = `http://127.0.0.1:8000/graphql/`; // Adjusted for the GraphQL endpoint
-
-  constructor(private http: HttpClient) {}
+  constructor(private apollo: Apollo) {}
 
   fetchData(ticker: string | null | undefined): Observable<ChartData> {
     if (ticker === null || ticker === undefined) {
-      return of({});
+      return throwError(() => new Error('Ticker is required'));
     }
-    const query = {
-      query: `{
-      getChartData(ticker: "${ticker}") {
-        success
-        message
-        ohlc {
-          x
-          y
+    const GET_CHART_DATA = gql`
+      query GetChartData($ticker: String!) {
+        getChartData(ticker: $ticker) {
+          success
+          message
+          ohlc {
+            x
+            y
+          }
+          volume {
+            x
+            y
+          }
+          squeeze {
+            x
+            y
+          }
+          kc {
+            x
+            y
+          }
+          earnings {
+            symbol
+            name
+            reportDate
+            fiscalDateEnding
+            estimate
+            currency
+          }
+          ticker
         }
-        volume {
-          x
-          y
-        }
-        squeeze {
-          x
-          y
-        }
-        kc {
-          x
-          y
-        }
-        earnings {
-          symbol
-          name
-          reportDate
-          fiscalDateEnding
-          estimate
-          currency
-        }
-        ticker
       }
-    }`,
-    };
-    return this.http.post<ChartDataResponse>(this.url, query).pipe(
-      map((response: ChartDataResponse) => {
-        if (response.errors) {
-          throw new Error(response.errors.map((err) => err.message).join(', '));
-        }
-        const chartData = response.data!.getChartData;
-        chartData.ohlc = this.dateStringsToEpoch(chartData.ohlc);
-        chartData.squeeze = this.dateStringsToEpoch(chartData.squeeze);
-        chartData.kc = this.dateStringsToEpoch(chartData.kc);
-        chartData.volume = this.dateStringsToEpoch(chartData.volume);
-        return chartData;
-      }),
-      catchError((error) => {
-        console.error('GraphQL query error:', error);
-        return throwError(() => new Error('Failed to fetch chart data: ' + error.message));
-      }),
-    );
-  }
+    `;
 
-  /**
-   * Converts the `x` property of each object in the input array from a date string to an epoch timestamp.
-   *
-   * This function is generic and ensures that the input objects have a property `x` of type `string`.
-   * It returns the same objects with the `x` property converted to a `number`, while preserving other properties.
-   *
-   * @param chartData - An array of objects with at least a string property `x`.
-   * @returns An array of objects with the `x` property converted to a number (epoch timestamp).
-   *
-   * @example
-   * const data = [
-   *   { x: "2023-01-01T00:00:00Z", y: 10 },
-   *   { x: "2023-01-02T00:00:00Z", y: 20 },
-   * ];
-   * const result = dateStringsToEpoch(data);
-   * console.log(result);
-   * // Output: [ { x: 1672531200000, y: 10 }, { x: 1672617600000, y: 20 } ]
-   */
-  private dateStringsToEpoch<T extends { x: string | number }>(
-    chartData: T[] | undefined,
-  ): (Omit<T, 'x'> & { x: number })[] {
-    return chartData
-      ? chartData.map((item): Omit<T, 'x'> & { x: number } => {
-          return {
-            ...item,
-            x: new Date(item.x).getTime(),
-          };
-        })
-      : [];
+    return this.apollo
+      .query<ChartDataResponse>({
+        query: GET_CHART_DATA,
+        variables: { ticker },
+        fetchPolicy: 'network-only',
+      })
+      .pipe(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        map((result: any) => {
+          if (result.errors) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            throw new Error(result.errors.map((e: any) => e.message).join(', '));
+          }
+          return result.data?.getChartData || {};
+        }),
+        catchError((error) => {
+          console.error('GraphQL query error:', error);
+          return throwError(() => new Error('Failed to fetch chart data: ' + error.message));
+        }),
+      );
+    // TODO: Consider adding watchQuery to update data in real-time... e.g.
+    // return this.apollo.watchQuery({ query: GET_CHART_DATA, variables: { ticker } }).valueChanges;
+    // return this.apollo.watchQuery<ChartDataResponse>({
+    //   query: GET_CHART_DATA,
+    //   variables: { ticker },
+    //   fetchPolicy: 'network-only'
+    // }).valueChanges.pipe(
+    //   map(result => {
+    //     if (result.errors) {
+    //       throw new Error(result.errors.map(e => e.message).join(', '));
+    //     }
+    //     const chartData = result.data.getChartData;
+    //     // Assuming date conversion if necessary
+    //     return chartData;
+    //   }),
+    //   catchError(error => {
+    //     console.error('GraphQL query error:', error);
+    //     return throwError(() => new Error('Failed to fetch chart data: ' + error.message));
+    //   })
+    // );
   }
 }

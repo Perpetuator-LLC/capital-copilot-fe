@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild, AfterViewInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
@@ -14,6 +14,8 @@ import {
   MatExpansionPanelTitle,
 } from '@angular/material/expansion';
 import { MatIcon } from '@angular/material/icon';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { ToolbarService } from '../toolbar.service';
 
 @Component({
   selector: 'app-register',
@@ -35,30 +37,41 @@ import { MatIcon } from '@angular/material/icon';
     MatExpansionPanelTitle,
     MatExpansionPanelHeader,
     MatIcon,
+    MatCheckbox,
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
 })
-export class RegisterComponent implements OnInit {
+export class RegisterComponent implements OnInit, AfterViewInit {
   // TODO: Add validation equivalent to back-end
   errors: string[] = [];
   registerForm = this.fb.group({
     username: [environment.TEST_USERNAME ?? '', [Validators.required, Validators.minLength(2)]],
     email: [environment.TEST_EMAIL ?? '', [Validators.required, Validators.email]],
     password: [environment.TEST_PASSWORD ?? '', [Validators.required, Validators.minLength(6)]],
+    acceptTerms: [false, Validators.requiredTrue],
   });
+  @ViewChild('toolbarTemplate', { static: true }) toolbarTemplate!: TemplateRef<never>;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
+    private toolbarService: ToolbarService,
   ) {}
+
+  ngAfterViewInit() {
+    const viewContainerRef = this.toolbarService.getViewContainerRef();
+    viewContainerRef.clear();
+    viewContainerRef.createEmbeddedView(this.toolbarTemplate);
+  }
 
   ngOnInit(): void {
     this.registerForm = this.fb.group({
       username: [environment.TEST_USERNAME ?? '', [Validators.required]],
       email: [environment.TEST_EMAIL ?? '', [Validators.required, Validators.email]],
       password: [environment.TEST_PASSWORD ?? '', [Validators.required, Validators.minLength(6)]],
+      acceptTerms: [false, Validators.requiredTrue],
     });
   }
 

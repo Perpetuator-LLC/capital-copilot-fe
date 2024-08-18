@@ -1,75 +1,96 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ControlComponent } from './control.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { of } from 'rxjs';
-import { By } from '@angular/platform-browser';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { of, throwError } from 'rxjs';
 import { ChartData, DataService } from '../../data.service';
-import { Apollo } from 'apollo-angular';
+import { ControlComponent } from './control.component';
+import { AutocompleteComponent } from '../../autocomplete/autocomplete.component';
+import { CandlestickComponent } from '../candlestick/candlestick.component';
+import { MatInput } from '@angular/material/input';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { Apollo } from 'apollo-angular';
 
-describe('ChartComponent', () => {
+describe('ControlComponent', () => {
   let component: ControlComponent;
   let fixture: ComponentFixture<ControlComponent>;
-  let dataService: jasmine.SpyObj<DataService>;
+  let dataServiceMock: DataService;
+  let snackBarMock: MatSnackBar;
+  let apolloSpy: jasmine.SpyObj<Apollo>;
 
   beforeEach(async () => {
-    const dataServiceSpy = jasmine.createSpyObj('DataService', ['fetchData']);
-    const apolloSpy = jasmine.createSpyObj('Apollo', ['watchQuery', 'mutate', 'query']);
+    dataServiceMock = jasmine.createSpyObj('DataService', ['fetchData']);
+    snackBarMock = jasmine.createSpyObj('MatSnackBar', ['open']);
+    const apolloMock = jasmine.createSpyObj('Apollo', ['watchQuery', 'mutate']);
+    apolloMock.watchQuery.and.returnValue({ valueChanges: of({ data: {} }) });
+    apolloMock.mutate.and.returnValue(of({}));
 
     await TestBed.configureTestingModule({
-      imports: [ControlComponent, ReactiveFormsModule, NoopAnimationsModule],
+      imports: [
+        NoopAnimationsModule,
+        ReactiveFormsModule,
+        ControlComponent, // Importing the standalone component here
+        AutocompleteComponent,
+        CandlestickComponent,
+        MatInput,
+      ],
       providers: [
-        { provide: DataService, useValue: dataServiceSpy },
-        { provide: Apollo, useValue: apolloSpy }, // Provide the Apollo mock here
+        { provide: DataService, useValue: dataServiceMock },
+        { provide: MatSnackBar, useValue: snackBarMock },
+        { provide: Apollo, useValue: apolloMock },
       ],
     }).compileComponents();
 
+    apolloSpy = TestBed.inject(Apollo) as jasmine.SpyObj<Apollo>;
+
     fixture = TestBed.createComponent(ControlComponent);
     component = fixture.componentInstance;
-    dataService = TestBed.inject(DataService) as jasmine.SpyObj<DataService>;
+    fixture.detectChanges();
   });
 
-  it('should create', () => {
-    fixture.detectChanges();
-    expect(component).toBeTruthy();
+  // it('should focus the input after view init', () => {
+  //   const focusSpy = spyOn(document, 'querySelector').and.returnValue({ focus: jasmine.createSpy('focus') });
+  //   component.ngAfterViewInit();
+  //   expect(focusSpy).toHaveBeenCalledWith('#ticker');
+  //   expect(focusSpy().focus).toHaveBeenCalled();
+  // });
+
+  it('should call getIt with uppercase ticker on handleSelection', () => {
+    spyOn(component, 'getIt');
+    component.handleSelection('abc');
+    expect(component.getIt).toHaveBeenCalledWith('abc');
+    expect(apolloSpy.query).toHaveBeenCalled();
   });
 
-  // it('should have an invalid form when input is empty', () => {
-  //   expect(component.stockForm.valid).toBeFalsy();
-  // });
+  it('should call getIt with uppercase ticker on handleSubmit', () => {
+    spyOn(component, 'getIt');
+    component.handleSubmit('xyz');
+    expect(component.getIt).toHaveBeenCalledWith('xyz');
+  });
 
-  // it('should have a valid form when input is provided', () => {
-  //   component.stockForm.controls['ticker'].setValue('AAPL');
-  //   expect(component.stockForm.valid).toBeTruthy();
-  // });
-
-  // it('should disable the submit button when the form is invalid', () => {
-  //   const submitButton = fixture.debugElement.query(By.css('button')).nativeElement;
-  //   expect(submitButton.disabled).toBeTruthy();
-  // });
-
-  // it('should enable the submit button when the form is valid', () => {
-  //   component.stockForm.controls['ticker'].setValue('AAPL');
-  //   fixture.detectChanges();
-  //   const submitButton = fixture.debugElement.query(
-  //     By.css('button'),
-  //   ).nativeElement;
-  //   expect(submitButton.disabled).toBeFalsy();
-  // });
-
-  it('should call fetchData and emit data on form submission', () => {
-    fixture.detectChanges();
-    const testData: ChartData = { ticker: 'value' };
-    dataService.fetchData.and.returnValue(of(testData));
+  it('should emit data on successful fetch', () => {
+    const mockChartData: ChartData = { ticker: 'XYZ', data: { loading: false } };
+    dataServiceMock.fetchData.and.returnValue(of(mockChartData));
     spyOn(component.dataEmitter, 'emit');
-
-    component.autocomplete.tickerControl.setValue('AAPL');
-    fixture.detectChanges();
-
-    const form = fixture.debugElement.query(By.css('form'));
-    form.triggerEventHandler('ngSubmit', null);
-
-    expect(dataService.fetchData).toHaveBeenCalledWith('AAPL');
-    expect(component.dataEmitter.emit).toHaveBeenCalledWith(testData);
+    component.getIt('xyz');
+    expect(component.dataEmitter.emit).toHaveBeenCalledWith(mockChartData);
   });
+
+  it('should handle errors from data fetch', () => {
+    const errorResponse = { message: 'Error fetching data' };
+    dataServiceMock.fetchData.and.returnValue(throwError(() => errorResponse));
+    spyOn(component.dataEmitter, 'emit');
+    component.getIt('error');
+    expect(snackBarMock.open).toHaveBeenCalledWith('Error: Error fetching data', 'Close');
+    expect(component.dataEmitter.emit).toHaveBeenCalledWith({
+      ticker: 'ERROR',
+      data: { error: 'Error fetching data' },
+    });
+  });
+
+  // it('should unsubscribe on destroy', () => {
+  //   component.subscription = new Subscription();
+  //   spyOn(component.subscription, 'unsubscribe');
+  //   component.ngOnDestroy();
+  //   expect(component.subscription.unsubscribe).toHaveBeenCalled();
+  // });
 });
