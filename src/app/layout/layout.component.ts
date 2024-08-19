@@ -8,7 +8,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
-import { Route, RouterLink, RouterLinkActive } from '@angular/router';
+import { Route, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { routes } from '../app.routes';
 import { Theme, ThemeService } from '../theme.service';
 import { AuthService } from '../auth.service';
@@ -59,6 +59,7 @@ export class LayoutComponent implements OnDestroy, OnInit {
     protected themeService: ThemeService,
     protected authService: AuthService,
     private toolbarService: ToolbarService,
+    private router: Router,
   ) {
     this.currentTheme = this.themeService.currentTheme;
   }
@@ -82,6 +83,7 @@ export class LayoutComponent implements OnDestroy, OnInit {
 
   logout() {
     this.authService.logout();
+    this.router.navigate(['/login']);
   }
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset).pipe(

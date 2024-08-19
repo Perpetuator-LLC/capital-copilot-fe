@@ -51,6 +51,11 @@ export const routes: Routes = [
     loadComponent: () => import('./login/login.component').then((c) => c.LoginComponent),
     title: 'Login',
   },
+  {
+    path: 'forgot',
+    loadComponent: () => import('./forgot-password/forgot-password.component').then((c) => c.ForgotPasswordComponent),
+    title: 'Forgot Password',
+  },
 ];
 
 export class AppRoutingModule {}

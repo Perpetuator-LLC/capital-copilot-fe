@@ -1,12 +1,10 @@
 import { AfterViewInit, Component, TemplateRef, ViewChild } from '@angular/core';
+import { MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { environment } from '../../environments/environment';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatInput } from '@angular/material/input';
-import { MatButton } from '@angular/material/button';
-import { MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
-import { environment } from '../../environments/environment';
+import { ToolbarService } from '../toolbar.service';
 import {
   MatAccordion,
   MatExpansionPanel,
@@ -14,37 +12,36 @@ import {
   MatExpansionPanelTitle,
 } from '@angular/material/expansion';
 import { MatIcon } from '@angular/material/icon';
-import { ToolbarService } from '../toolbar.service';
+import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatButton } from '@angular/material/button';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-forgot-password',
   standalone: true,
   imports: [
-    ReactiveFormsModule,
-    MatFormField,
-    MatInput,
-    MatButton,
-    MatLabel,
     MatCard,
-    MatCardTitle,
     MatCardHeader,
     MatCardContent,
-    MatCardActions,
     MatAccordion,
     MatExpansionPanel,
     MatExpansionPanelHeader,
     MatExpansionPanelTitle,
     MatIcon,
+    MatInput,
+    MatFormField,
+    MatLabel,
+    MatCardActions,
+    MatCardTitle,
+    MatButton,
+    ReactiveFormsModule,
   ],
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss'],
+  templateUrl: './forgot-password.component.html',
+  styleUrl: './forgot-password.component.scss',
 })
-export class LoginComponent implements AfterViewInit {
+export class ForgotPasswordComponent implements AfterViewInit {
   errors: string[] = [];
-  loginForm = new FormGroup({
-    // TODO: Add validation equivalent to back-end
-    password: new FormControl(environment.TEST_PASSWORD ?? '', [Validators.required, Validators.minLength(5)]),
-    username: new FormControl(environment.TEST_USERNAME ?? '', [Validators.required, Validators.minLength(2)]),
+  forgotForm = new FormGroup({
+    email: new FormControl(environment.TEST_EMAIL ?? '', [Validators.required, Validators.email]),
   });
   @ViewChild('toolbarTemplate', { static: true }) toolbarTemplate!: TemplateRef<never>;
 
@@ -62,11 +59,11 @@ export class LoginComponent implements AfterViewInit {
 
   onSubmit() {
     this.errors = [];
-    this.authService.login(this.loginForm.value.username as string, this.loginForm.value.password as string).subscribe({
+    this.authService.forgot(this.forgotForm.value.email as string).subscribe({
       next: () => {
         this.errors = this.authService.getErrors();
         if (this.errors.length === 0) {
-          this.router.navigate(['/charts']);
+          this.router.navigate(['/login']);
         }
         // for (const error of this.authService.getErrors()) {
         //   this.errors.push(error.toString());
@@ -74,8 +71,8 @@ export class LoginComponent implements AfterViewInit {
         // this.errors.push('Registration failed. No token returned from authentication service.');
       },
       error: (error) => {
-        this.errors.push('Login failed:' + error.toString());
-        console.error('Login failed', error);
+        this.errors.push('Reset failed:' + error.toString());
+        console.error('Reset failed', error);
         // this.errors += error.error.detail;
       },
     });

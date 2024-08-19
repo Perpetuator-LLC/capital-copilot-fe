@@ -17,10 +17,25 @@ export class AuthService {
   private tokenUrl = 'http://127.0.0.1:8000/api/token/';
   private refreshTokenUrl = 'http://127.0.0.1:8000/api/token/refresh/';
   private registerUrl = 'http://127.0.0.1:8000/api/register/';
+  private forgotUrl = 'http://127.0.0.1:8000/api/forgot/';
   private tokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(this.getToken());
   private loggedInSignal: WritableSignal<boolean> = signal(!this.isRefreshTokenExpired());
 
   constructor(private http: HttpClient) {}
+
+  forgot(email: string): Observable<Token | null> {
+    this.errors = [];
+    return this.http.post<Token>(this.forgotUrl, { email }).pipe(
+      tap((response) => this.setSession(response)),
+      catchError((error) => {
+        console.error('Login error:', error);
+        Object.keys(error.error).forEach((key) => {
+          this.errors.push(`Login error (${key}): ${error.error[key]}`);
+        });
+        return of(null); // Ensuring that we always return an Observable of the same type
+      }),
+    );
+  }
 
   login(username: string, password: string): Observable<Token | null> {
     this.errors = [];

@@ -40,6 +40,7 @@ describe('RegisterComponent', () => {
       username: 'testuser',
       email: 'test@example.com',
       password: 'password123',
+      acceptTerms: true,
     });
 
     const mockToken = {
@@ -57,6 +58,7 @@ describe('RegisterComponent', () => {
       username: 'testuser',
       email: 'test@example.com',
       password: 'password123',
+      acceptTerms: true,
     });
 
     const mockError = 'Registration failed: mock error';
@@ -74,6 +76,7 @@ describe('RegisterComponent', () => {
       username: '',
       email: 'invalid-email',
       password: '123',
+      acceptTerms: true,
     });
     component.onSubmit();
     expect(mockAuthService.register).not.toHaveBeenCalled();
