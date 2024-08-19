@@ -39,15 +39,23 @@ Now open a pull request to merge it.
 
 ## Commit Message Format
 
+A tribal rule in this project is to use this rule:
+- Use imperative mood or present tense: "add feature" not "added feature" or "adds feature".
+- Think to yourself: "This change will..." and complete the sentence.
+
 Follow https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716
 
+If and only if the change touches _production_ code it should be prefixed with `fix:` or `feat:`...
 - feat: (new feature for the user, not a new feature for build script)
 - fix: (bug fix for the user, not a fix to a build script)
+
+If the change does not touch _production_ code it should be prefixed with:
 - docs: (changes to the documentation)
 - style: (formatting, missing semi colons, etc; no production code change)
 - refactor: (refactoring production code, e.g. renaming a variable)
 - test: (adding missing tests, refactoring tests; no production code change)
 - chore: (updating grunt tasks etc; no production code change)
+
 
 # Code Quality
 
