@@ -39,6 +39,7 @@
     "@apollo/client": "^3.0.0",
     "apexcharts": "^3.49.1",
     "apollo-angular": "7.0.2",
+    "axios": "^1.7.4",
     "graphql": "^16",
     "ng-apexcharts": "^1.10.0",
     "rxjs": "~7.8.0",
