@@ -1,87 +1,94 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DashboardComponent } from './dashboard.component';
-import { AuthService } from '../../auth.service';
 import { By } from '@angular/platform-browser';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ChartComponent } from 'ng-apexcharts';
-import { CandlestickComponent } from '../candlestick/candlestick.component';
+import { AuthService } from '../../auth.service';
+import { ToolbarService } from '../../toolbar.service';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
-describe('LandingComponent', () => {
+describe('DashboardComponent', () => {
   let component: DashboardComponent;
   let fixture: ComponentFixture<DashboardComponent>;
   let authService: jasmine.SpyObj<AuthService>;
+  let toolbarService: jasmine.SpyObj<ToolbarService>;
 
   beforeEach(async () => {
     const authServiceSpy = jasmine.createSpyObj('AuthService', ['isLoggedIn']);
+    toolbarService = jasmine.createSpyObj('ToolbarService', ['getViewContainerRef', 'clearToolbarComponent']);
+    const mockViewContainerRef = jasmine.createSpyObj('ViewContainerRef', ['clear', 'createEmbeddedView']);
+    toolbarService.getViewContainerRef.and.returnValue(mockViewContainerRef);
 
     await TestBed.configureTestingModule({
-      imports: [ChartComponent, CandlestickComponent, DashboardComponent, HttpClientTestingModule],
-      providers: [{ provide: AuthService, useValue: authServiceSpy }],
+      imports: [DashboardComponent, NoopAnimationsModule],
+      providers: [
+        { provide: AuthService, useValue: authServiceSpy },
+        { provide: ToolbarService, useValue: toolbarService },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(DashboardComponent);
     component = fixture.componentInstance;
     authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
-    fixture.detectChanges();
+    toolbarService = TestBed.inject(ToolbarService) as jasmine.SpyObj<ToolbarService>;
+
+    // Default setup for isLoggedIn method
+    authService.isLoggedIn.and.returnValue(true);
+
+    fixture.detectChanges(); // Initialize component view
   });
 
-  it('should create', () => {
+  it('should create the component', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should display login message when not logged in', () => {
-    authService.isLoggedIn.and.returnValue(false);
-    fixture.detectChanges();
+  describe('ngAfterViewInit', () => {
+    it('should create the toolbar view if the user is logged in', () => {
+      const viewContainerRefSpy = jasmine.createSpyObj('ViewContainerRef', ['clear', 'createEmbeddedView']);
+      toolbarService.getViewContainerRef.and.returnValue(viewContainerRefSpy);
 
-    const loginMessage = fixture.debugElement.query(By.css('p')).nativeElement;
-    expect(loginMessage.textContent).toContain('Please login to use the app.');
+      component.ngAfterViewInit();
+
+      expect(toolbarService.getViewContainerRef).toHaveBeenCalled();
+      expect(viewContainerRefSpy.clear).toHaveBeenCalled();
+      expect(viewContainerRefSpy.createEmbeddedView).toHaveBeenCalledWith(component.toolbarTemplate);
+    });
   });
 
-  it('should display chart and candlestick graph when logged in', () => {
-    authService.isLoggedIn.and.returnValue(true);
-    fixture.detectChanges();
+  describe('ngOnDestroy', () => {
+    it('should call clearToolbarComponent on destroy', () => {
+      component.ngOnDestroy();
 
-    const chartComponent = fixture.debugElement.query(By.directive(ChartComponent));
-    const candlestickGraphComponent = fixture.debugElement.query(By.directive(CandlestickComponent));
-
-    expect(chartComponent).toBeTruthy();
-    expect(candlestickGraphComponent).toBeTruthy();
+      expect(toolbarService.clearToolbarComponent).toHaveBeenCalled();
+    });
   });
 
-  it('should handle data emitted from chart component', () => {
-    authService.isLoggedIn.and.returnValue(true);
-    fixture.detectChanges();
+  describe('Template Rendering', () => {
+    it('should render chart components when the user is logged in', () => {
+      fixture.detectChanges();
 
-    const chartComponent = fixture.debugElement.query(By.directive(ChartComponent));
-    const testData = { ticker: 'value' };
+      const earningsTable = fixture.debugElement.query(By.css('app-charts-earnings-table'));
+      const candlestickChart = fixture.debugElement.query(By.css('app-charts-candlestick'));
 
-    chartComponent.triggerEventHandler('dataEmitter', testData);
-    fixture.detectChanges();
+      expect(earningsTable).toBeTruthy();
+      expect(candlestickChart).toBeTruthy();
+    });
 
-    expect(component.dataSource).toEqual(testData);
+    it('should render the login prompt when the user is not logged in', () => {
+      authService.isLoggedIn.and.returnValue(false);
+      fixture.detectChanges();
+
+      const loginPrompt = fixture.debugElement.query(By.css('p'));
+      expect(loginPrompt.nativeElement.textContent.trim()).toBe('Please login to use the app.');
+    });
   });
 
-  it('should call handleData when dataEmitter emits data', () => {
-    spyOn(component, 'handleData');
-    authService.isLoggedIn.and.returnValue(true);
-    fixture.detectChanges();
+  describe('handleData method', () => {
+    it('should update dataSource when handleData is called', () => {
+      const mockData = {
+        /* mock chart data */
+      };
+      component.handleData(mockData);
 
-    const chartComponent = fixture.debugElement.query(By.directive(ChartComponent));
-    const testData = { ticker: 'value' };
-
-    chartComponent.triggerEventHandler('dataEmitter', testData);
-    fixture.detectChanges();
-
-    expect(component.handleData).toHaveBeenCalledWith(testData);
-  });
-
-  it('should initialize with correct state', () => {
-    expect(component.dataSource).toBeUndefined();
-    expect(component.authService).toBeDefined();
-  });
-
-  it('should inject AuthService properly', () => {
-    expect(authService).toBeTruthy();
-    expect(authService.isLoggedIn).toBeDefined();
+      expect(component.dataSource).toBe(mockData);
+    });
   });
 });

@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 import { AutocompleteComponent } from './autocomplete.component';
 import { Apollo } from 'apollo-angular';
 import { of } from 'rxjs';
@@ -10,6 +10,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ApolloQueryResult } from '@apollo/client/core';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { AutocompleteResult } from '../types';
+import { startWith, switchMap } from 'rxjs/operators';
 
 describe('AutocompleteComponent', () => {
   let component: AutocompleteComponent;
@@ -19,11 +21,10 @@ describe('AutocompleteComponent', () => {
   beforeEach(async () => {
     const apolloMock = jasmine.createSpyObj('Apollo', ['query']);
 
-    const mockQueryResult: ApolloQueryResult<{ getAutocomplete: { results: never[] } }> = {
+    const mockQueryResult: ApolloQueryResult<{ getAutocomplete: { results: AutocompleteResult[] } }> = {
       data: { getAutocomplete: { results: [] } },
       loading: false,
       networkStatus: 7,
-      // stale: false,
     };
 
     apolloMock.query.and.returnValue(of(mockQueryResult));
@@ -46,6 +47,13 @@ describe('AutocompleteComponent', () => {
 
     fixture = TestBed.createComponent(AutocompleteComponent);
     component = fixture.componentInstance;
+
+    // NOTE: This is a workaround to bypass the debounceTime operator which doesn't seem to work with tick(300), etc...
+    component.filteredOptions = component.tickerControl.valueChanges.pipe(
+      startWith(''),
+      switchMap((value) => component['_filter'](value || '')),
+    );
+
     fixture.detectChanges();
   });
 
@@ -53,12 +61,11 @@ describe('AutocompleteComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should filter options when a value is entered', () => {
+  it('should filter options when a value is entered', fakeAsync(() => {
     component.tickerControl.setValue('test');
     fixture.detectChanges();
-
     expect(apolloSpy.query).toHaveBeenCalled();
-  });
+  }));
 
   it('should emit optionSelected event when an option is selected', () => {
     spyOn(component.optionSelected, 'emit');

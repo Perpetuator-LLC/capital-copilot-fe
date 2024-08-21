@@ -9,26 +9,34 @@ import { CandlestickComponent } from '../candlestick/candlestick.component';
 import { MatInput } from '@angular/material/input';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { Apollo } from 'apollo-angular';
+import { ApolloQueryResult } from '@apollo/client/core';
 
 describe('ControlComponent', () => {
   let component: ControlComponent;
   let fixture: ComponentFixture<ControlComponent>;
-  let dataServiceMock: DataService;
+  let dataServiceMock: jasmine.SpyObj<DataService>;
   let snackBarMock: MatSnackBar;
-  let apolloSpy: jasmine.SpyObj<Apollo>;
+  let apolloMock: jasmine.SpyObj<Apollo>;
 
   beforeEach(async () => {
     dataServiceMock = jasmine.createSpyObj('DataService', ['fetchData']);
     snackBarMock = jasmine.createSpyObj('MatSnackBar', ['open']);
-    const apolloMock = jasmine.createSpyObj('Apollo', ['watchQuery', 'mutate']);
-    apolloMock.watchQuery.and.returnValue({ valueChanges: of({ data: {} }) });
-    apolloMock.mutate.and.returnValue(of({}));
+    apolloMock = jasmine.createSpyObj('Apollo', ['query']);
+
+    // Provide mock return values for the Apollo methods with the required properties
+    const mockApolloQueryResult: ApolloQueryResult<unknown> = {
+      data: { getAutocomplete: { results: [] } },
+      loading: false,
+      networkStatus: 7,
+      errors: undefined,
+    };
+    apolloMock.query.and.returnValue(of(mockApolloQueryResult));
 
     await TestBed.configureTestingModule({
       imports: [
         NoopAnimationsModule,
         ReactiveFormsModule,
-        ControlComponent, // Importing the standalone component here
+        ControlComponent,
         AutocompleteComponent,
         CandlestickComponent,
         MatInput,
@@ -39,8 +47,6 @@ describe('ControlComponent', () => {
         { provide: Apollo, useValue: apolloMock },
       ],
     }).compileComponents();
-
-    apolloSpy = TestBed.inject(Apollo) as jasmine.SpyObj<Apollo>;
 
     fixture = TestBed.createComponent(ControlComponent);
     component = fixture.componentInstance;
@@ -55,14 +61,19 @@ describe('ControlComponent', () => {
   // });
 
   it('should call getIt with uppercase ticker on handleSelection', () => {
-    spyOn(component, 'getIt');
+    spyOn(component, 'getIt').and.callThrough();
+    const mockChartData: ChartData = { ticker: 'XYZ', data: { loading: false } };
+    dataServiceMock.fetchData.and.returnValue(of(mockChartData));
     component.handleSelection('abc');
+    fixture.detectChanges(); // Initialize component view
     expect(component.getIt).toHaveBeenCalledWith('abc');
-    expect(apolloSpy.query).toHaveBeenCalled();
+    expect(dataServiceMock.fetchData).toHaveBeenCalledWith('ABC');
   });
 
   it('should call getIt with uppercase ticker on handleSubmit', () => {
-    spyOn(component, 'getIt');
+    spyOn(component, 'getIt').and.callThrough();
+    const mockChartData: ChartData = { ticker: 'XYZ', data: { loading: false } };
+    dataServiceMock.fetchData.and.returnValue(of(mockChartData));
     component.handleSubmit('xyz');
     expect(component.getIt).toHaveBeenCalledWith('xyz');
   });

@@ -15,9 +15,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   styleUrl: './control.component.scss',
 })
 export class ControlComponent implements OnDestroy, AfterViewInit {
-  // stockForm = new FormGroup({
-  //   ticker: new FormControl('', Validators.required),
-  // });
   @ViewChild(AutocompleteComponent) autocomplete!: AutocompleteComponent;
   @Output() dataEmitter = new EventEmitter<ChartData>();
   error: string | null = null;
@@ -55,6 +52,8 @@ export class ControlComponent implements OnDestroy, AfterViewInit {
     // if (this.stockForm) {
     //   this.stockForm.controls['ticker'].setValue('');
     // }
+    // TODO: It appears that GraphQL has a very similar structure of 'data' with 'loading' and 'error' properties.
+    //     This could be a good candidate for a shared interface. Let's see if we can refactor this to use that.
     this.dataEmitter.emit({ ticker: ticker, data: { loading: true } });
     this.subscription = this.dataService.fetchData(ticker).subscribe({
       next: (data: ChartData) => {

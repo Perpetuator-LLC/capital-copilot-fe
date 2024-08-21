@@ -1,7 +1,7 @@
 import { Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Observable, of, take } from 'rxjs';
-import { debounceTime, switchMap, startWith, map } from 'rxjs/operators';
+import { debounceTime, map, startWith, switchMap } from 'rxjs/operators';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatAutocomplete, MatAutocompleteTrigger, MatOption } from '@angular/material/autocomplete';
 import { AsyncPipe, NgForOf } from '@angular/common';
@@ -9,6 +9,7 @@ import { MatInput } from '@angular/material/input';
 import { Apollo, gql } from 'apollo-angular';
 import { MatCard, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle } from '@angular/material/card';
 import { MatTooltip } from '@angular/material/tooltip';
+import { AutocompleteResult } from '../types';
 
 const AUTOCOMPLETE_QUERY = gql`
   query GetAutocomplete($query: String!) {
@@ -23,12 +24,6 @@ const AUTOCOMPLETE_QUERY = gql`
     }
   }
 `;
-
-interface AutocompleteResult {
-  symbol: string;
-  name: string;
-  cik: string;
-}
 
 @Component({
   selector: 'app-autocomplete',
@@ -66,7 +61,7 @@ export class AutocompleteComponent {
   constructor(private readonly apollo: Apollo) {
     this.filteredOptions = this.tickerControl.valueChanges.pipe(
       startWith(''),
-      debounceTime(300),
+      debounceTime(200), // Wait after the last keystroke before sending, avoid unnecessary requests
       switchMap((value) => this._filter(value || '')),
     );
   }

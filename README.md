@@ -2,8 +2,11 @@
 
 - [x] Check-in these changes, review, etc.
 - [ ] Get pre-commit stuff working, with 90% coverage, formatting, copyrights, etc.
-  - [ ] Add changelog script
+  - [x] Add changelog script
   - [ ] Add copyright check script
+  - [ ] Add 90% coverage
+- [ ] Hide Forgot Password link and add to login page
+- [ ] Add a forgot password page
 - [ ] Edit user info
 - [ ] Finish switching all GQL calls to Apollo
 - [ ] Add a stored value for the user to accept the terms and privacy policy
@@ -13,10 +16,10 @@
 - [x] Create user with existing email is allowed, need to block
 - [x] Format register
 - [x] Add link to terms and privacy policy
-- [ ] Add checkmark to record if they accept on account create
-- [ ] Delete user and make sure the API stops working
+- [x] Add checkmark to record if they accept on account create
+- [x] Delete user and make sure the API stops working
 - [x] Add env support, and switch testing users to come from env
-- [ ] Verify email before access
+- [x] Verify email before access
 - [ ] Switch to new inject syntax
 - [x] On landing but login required add a next query param to redirect to after login
 

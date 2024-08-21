@@ -15,33 +15,6 @@
       </button>
     </mat-toolbar>
     <mat-nav-list>
-      <!--      Add buttons...-->
-      <!--      @if ((isHandset$ | async) === false && !drawer.opened) {-->
-      <!--          @for (item of rootRoutes; track item.path) {-->
-      <!--            @if (shouldShow(item)) {-->
-      <!--              <button-->
-      <!--                type="button"-->
-      <!--                aria-label="A menu button (add title?)"-->
-      <!--                mat-icon-button-->
-      <!--                [routerLink]="item.path"-->
-      <!--                #link="routerLinkActive"-->
-      <!--                routerLinkActive-->
-      <!--              >-->
-      <!--                <mat-icon>menu_open</mat-icon>-->
-      <!--              </button>-->
-      <!--            }-->
-      <!--          }-->
-      <!--          @if (this.authService.isLoggedIn()) {-->
-      <!--            <a-->
-      <!--              mat-list-item-->
-      <!--              tabindex="0"-->
-      <!--              (click)="logout()"-->
-      <!--              (keydown.enter)="logout()"-->
-      <!--              (keydown.space)="logout()">-->
-      <!--              Logout-->
-      <!--            </a>-->
-      <!--          }-->
-      <!--      } @else {-->
       @for (item of rootRoutes; track item.path) {
         @if (shouldShow(item)) {
           <a
@@ -75,7 +48,6 @@
       </mat-button-toggle-group>
       <a mat-list-item tabindex="0" target="_blank" href="privacy-policy.html"> Privacy Policy </a>
       <a mat-list-item tabindex="0" target="_blank" href="terms-and-conditions.html"> Terms and Conditions </a>
-      <!--      }-->
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
@@ -92,15 +64,11 @@
         <ng-content></ng-content>
       </div>
     </div>
-    <!--    <mat-footer-row>-->
-    <!--      <mat-footer-cell>-->
     <p>
       &copy; 2024 Perpetuator LLC. - By using Capitol Copilot AI, you agree to our
       <a tabindex="0" target="_blank" href="terms-and-conditions.html"> Terms and Conditions </a>
       and
       <a tabindex="0" target="_blank" href="privacy-policy.html"> Privacy Policy </a>
     </p>
-    <!--      </mat-footer-cell>-->
-    <!--    </mat-footer-row>-->
   </mat-sidenav-content>
 </mat-sidenav-container>

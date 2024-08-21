@@ -6,14 +6,19 @@ import { Router } from '@angular/router';
 import { FormBuilder } from '@angular/forms';
 import { of, throwError } from 'rxjs';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { ToolbarService } from '../toolbar.service';
 
 describe('RegisterComponent', () => {
   let component: RegisterComponent;
   let fixture: ComponentFixture<RegisterComponent>;
   let mockAuthService: jasmine.SpyObj<AuthService>;
   let mockRouter: jasmine.SpyObj<Router>;
+  let mockToolbarService: jasmine.SpyObj<ToolbarService>;
 
   beforeEach(async () => {
+    mockToolbarService = jasmine.createSpyObj('ToolbarService', ['getViewContainerRef']);
+    const mockViewContainerRef = jasmine.createSpyObj('ViewContainerRef', ['clear', 'createEmbeddedView']);
+    mockToolbarService.getViewContainerRef.and.returnValue(mockViewContainerRef);
     mockAuthService = jasmine.createSpyObj('AuthService', ['register', 'getErrors']);
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 
@@ -22,6 +27,7 @@ describe('RegisterComponent', () => {
       providers: [
         { provide: AuthService, useValue: mockAuthService },
         { provide: Router, useValue: mockRouter },
+        { provide: ToolbarService, useValue: mockToolbarService },
         FormBuilder,
       ],
     }).compileComponents();

@@ -65,15 +65,10 @@ export class ForgotPasswordComponent implements AfterViewInit {
         if (this.errors.length === 0) {
           this.router.navigate(['/login']);
         }
-        // for (const error of this.authService.getErrors()) {
-        //   this.errors.push(error.toString());
-        // }
-        // this.errors.push('Registration failed. No token returned from authentication service.');
       },
       error: (error) => {
-        this.errors.push('Reset failed:' + error.toString());
+        this.errors.push('Reset failed ' + error.toString());
         console.error('Reset failed', error);
-        // this.errors += error.error.detail;
       },
     });
   }

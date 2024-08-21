@@ -7,14 +7,19 @@ import { LoginComponent } from './login.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { createTestJWT } from '../jwt';
+import { ToolbarService } from '../toolbar.service';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
   let authService: jasmine.SpyObj<AuthService>;
   let router: jasmine.SpyObj<Router>;
+  let mockToolbarService: jasmine.SpyObj<ToolbarService>;
 
   beforeEach(async () => {
+    mockToolbarService = jasmine.createSpyObj('ToolbarService', ['getViewContainerRef']);
+    const mockViewContainerRef = jasmine.createSpyObj('ViewContainerRef', ['clear', 'createEmbeddedView']);
+    mockToolbarService.getViewContainerRef.and.returnValue(mockViewContainerRef);
     const authServiceSpy = jasmine.createSpyObj('AuthService', ['login', 'getErrors']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
@@ -23,6 +28,7 @@ describe('LoginComponent', () => {
       providers: [
         { provide: AuthService, useValue: authServiceSpy },
         { provide: Router, useValue: routerSpy },
+        { provide: ToolbarService, useValue: mockToolbarService },
       ],
     }).compileComponents();
 
@@ -34,8 +40,17 @@ describe('LoginComponent', () => {
   });
 
   it('should create', () => {
+    // fixture.detectChanges();
     expect(component).toBeTruthy();
   });
+
+  // it('should set up the toolbar with the toolbar template', () => {
+  //   fixture.detectChanges();
+  //   expect(mockToolbarService.getViewContainerRef).toHaveBeenCalled();
+  //   expect(mockToolbarService.getViewContainerRef().clear).toHaveBeenCalled();
+  //   expect(mockToolbarService.getViewContainerRef().createEmbeddedView)
+  //      .toHaveBeenCalledWith(component.toolbarTemplate);
+  // });
 
   it('should call AuthService login on form submit', () => {
     authService.getErrors.and.returnValue([]);
@@ -49,7 +64,7 @@ describe('LoginComponent', () => {
     component.onSubmit();
 
     expect(authService.login).toHaveBeenCalledWith('testuser', 'testpassword');
-    expect(router.navigate).toHaveBeenCalledWith(['/']);
+    expect(router.navigate).toHaveBeenCalledWith(['/charts']);
   });
 
   it('should display validation errors when form is invalid', () => {

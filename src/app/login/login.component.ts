@@ -68,15 +68,10 @@ export class LoginComponent implements AfterViewInit {
         if (this.errors.length === 0) {
           this.router.navigate(['/charts']);
         }
-        // for (const error of this.authService.getErrors()) {
-        //   this.errors.push(error.toString());
-        // }
-        // this.errors.push('Registration failed. No token returned from authentication service.');
       },
       error: (error) => {
         this.errors.push('Login failed:' + error.toString());
         console.error('Login failed', error);
-        // this.errors += error.error.detail;
       },
     });
   }
