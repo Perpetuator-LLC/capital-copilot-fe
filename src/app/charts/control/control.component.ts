@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, OnDestroy, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { ChartData, DataService } from '../../data.service';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CandlestickComponent } from '../candlestick/candlestick.component';
@@ -14,7 +14,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   templateUrl: './control.component.html',
   styleUrl: './control.component.scss',
 })
-export class ControlComponent implements OnDestroy, AfterViewInit {
+export class ControlComponent implements OnDestroy, OnInit {
   @ViewChild(AutocompleteComponent) autocomplete!: AutocompleteComponent;
   @Output() dataEmitter = new EventEmitter<ChartData>();
   error: string | null = null;
@@ -25,7 +25,7 @@ export class ControlComponent implements OnDestroy, AfterViewInit {
     private snackBar: MatSnackBar,
   ) {}
 
-  ngAfterViewInit(): void {
+  ngOnInit(): void {
     this.focusInput();
   }
 

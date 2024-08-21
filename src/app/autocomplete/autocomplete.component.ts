@@ -61,7 +61,7 @@ export class AutocompleteComponent {
   constructor(private readonly apollo: Apollo) {
     this.filteredOptions = this.tickerControl.valueChanges.pipe(
       startWith(''),
-      debounceTime(200), // Wait after the last keystroke before sending, avoid unnecessary requests
+      debounceTime(200), // Wait (ms) after the last keystroke before sending, avoid unnecessary requests
       switchMap((value) => this._filter(value || '')),
     );
   }
