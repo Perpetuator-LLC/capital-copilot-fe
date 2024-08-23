@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { AuthService } from '../auth.service';
 import { LoginComponent } from './login.component';
@@ -22,6 +22,7 @@ describe('LoginComponent', () => {
     mockToolbarService.getViewContainerRef.and.returnValue(mockViewContainerRef);
     const authServiceSpy = jasmine.createSpyObj('AuthService', ['login', 'getErrors']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    const mockActivatedRoute = { snapshot: { queryParams: of({}) } };
 
     await TestBed.configureTestingModule({
       imports: [ReactiveFormsModule, LoginComponent, HttpClientTestingModule, NoopAnimationsModule],
@@ -29,6 +30,7 @@ describe('LoginComponent', () => {
         { provide: AuthService, useValue: authServiceSpy },
         { provide: Router, useValue: routerSpy },
         { provide: ToolbarService, useValue: mockToolbarService },
+        { provide: ActivatedRoute, useValue: mockActivatedRoute },
       ],
     }).compileComponents();
 
@@ -40,7 +42,6 @@ describe('LoginComponent', () => {
   });
 
   it('should create', () => {
-    // fixture.detectChanges();
     expect(component).toBeTruthy();
   });
 

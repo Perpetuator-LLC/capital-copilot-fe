@@ -62,6 +62,9 @@ export class ForgotPasswordComponent implements AfterViewInit {
     this.authService.forgot(this.forgotForm.value.email as string).subscribe({
       next: () => {
         this.errors = this.authService.getErrors();
+        if (this.errors.length === 0) {
+          this.router.navigate(['/login']);
+        }
       },
       error: (error) => {
         this.errors.push('Reset failed ' + error.toString());
