@@ -10,7 +10,9 @@ export interface RegisterError {
 }
 
 export interface RegisterResponse {
+  access?: string;
   detail?: string;
+  refresh?: string;
 }
 
 @Injectable({
