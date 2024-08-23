@@ -2,7 +2,7 @@
 
 - [x] Check-in these changes, review, etc.
 - [ ] Get pre-commit stuff working, with 90% coverage, formatting, copyrights, etc.
-  - [x] Add changelog script
+  - [ ] Add changelog script and CHANGELOG
   - [ ] Add copyright check script
   - [ ] Add 90% coverage
 - [ ] Hide Forgot Password link and add to login page

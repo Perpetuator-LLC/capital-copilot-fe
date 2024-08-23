@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 @Injectable()
 export class AuthInterceptorService implements HttpInterceptor {
   private excludedUrls = [
+    'http://127.0.0.1:8000/api/forgot/',
     'http://127.0.0.1:8000/api/register/',
     'http://127.0.0.1:8000/api/token/',
     'http://127.0.0.1:8000/api/token/refresh/',
@@ -25,7 +26,7 @@ export class AuthInterceptorService implements HttpInterceptor {
 
     if (this.authService.isRefreshTokenExpired()) {
       this.authService.logout();
-      console.debug('AuthInterceptor: Redirecting to login page');
+      console.debug('AuthInterceptor: Redirecting to login page (refresh token expired)');
       this.router.navigate(['/login']);
       return new Observable<HttpEvent<unknown>>();
     }
@@ -43,7 +44,7 @@ export class AuthInterceptorService implements HttpInterceptor {
           catchError((error) => {
             if (error.status === 401) {
               this.authService.logout();
-              console.debug('AuthInterceptor: Redirecting to login page');
+              console.debug('AuthInterceptor: Redirecting to login page (failed to authenticate)');
               this.router.navigate(['/login']);
             }
             throw error;

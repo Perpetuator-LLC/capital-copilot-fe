@@ -9,6 +9,10 @@ export interface RegisterError {
   messages: string[];
 }
 
+export interface RegisterResponse {
+  detail?: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -23,10 +27,10 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  forgot(email: string): Observable<Token | null> {
+  forgot(email: string): Observable<RegisterResponse | null> {
     this.errors = [];
-    return this.http.post<Token>(this.forgotUrl, { email }).pipe(
-      tap((response) => this.setSession(response)),
+    return this.http.post<RegisterResponse>(this.forgotUrl, { email }).pipe(
+      tap((response) => this.errors.push(response.detail ? response.detail : 'Password reset email sent')),
       catchError((error) => {
         console.error('Login error:', error);
         Object.keys(error.error).forEach((key) => {

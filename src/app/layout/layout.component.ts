@@ -78,7 +78,7 @@ export class LayoutComponent implements OnDestroy, OnInit {
     } else if (item.path && this.authRequiredRoutes.includes(item.path)) {
       return this.isLoggedIn();
     }
-    return true; // default to show all other routes
+    return false; // default: hide all other routes
   }
 
   logout() {
