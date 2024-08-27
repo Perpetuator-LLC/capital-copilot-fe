@@ -4,14 +4,15 @@ import { Observable, from } from 'rxjs';
 import { switchMap, catchError } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 import { Router } from '@angular/router';
+import { environment } from '../environments/environment';
 
 @Injectable()
 export class AuthInterceptorService implements HttpInterceptor {
   private excludedUrls = [
-    'http://127.0.0.1:8000/api/forgot/',
-    'http://127.0.0.1:8000/api/register/',
-    'http://127.0.0.1:8000/api/token/',
-    'http://127.0.0.1:8000/api/token/refresh/',
+    environment.API_URL + '/api/forgot/',
+    environment.API_URL + '/api/register/',
+    environment.API_URL + '/api/token/',
+    environment.API_URL + '/api/token/refresh/',
   ];
 
   constructor(

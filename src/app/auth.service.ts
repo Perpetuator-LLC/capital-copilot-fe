@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, of } from 'rxjs';
 import { catchError, switchMap, tap } from 'rxjs/operators';
 import { JWT, Token } from './types';
 import { decodeJWT } from './jwt';
+import { environment } from '../environments/environment';
 
 export interface RegisterError {
   messages: string[];
@@ -20,10 +21,10 @@ export interface RegisterResponse {
 })
 export class AuthService {
   private errors: string[] = [];
-  private tokenUrl = 'http://127.0.0.1:8000/api/token/';
-  private refreshTokenUrl = 'http://127.0.0.1:8000/api/token/refresh/';
-  private registerUrl = 'http://127.0.0.1:8000/api/register/';
-  private forgotUrl = 'http://127.0.0.1:8000/api/forgot/';
+  private tokenUrl = environment.API_URL + '/api/token/';
+  private refreshTokenUrl = environment.API_URL + '/api/token/refresh/';
+  private registerUrl = environment.API_URL + '/api/register/';
+  private forgotUrl = environment.API_URL + '/api/forgot/';
   private tokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(this.getToken());
   private loggedInSignal: WritableSignal<boolean> = signal(!this.isRefreshTokenExpired());
 
