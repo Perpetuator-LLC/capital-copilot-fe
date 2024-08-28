@@ -2,19 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest } from '@angular/common/http';
 import { Observable, from } from 'rxjs';
 import { switchMap, catchError } from 'rxjs/operators';
-import { AuthService } from './auth.service';
+import { AuthService, AuthUrls } from './auth.service';
 import { Router } from '@angular/router';
-import { environment } from '../environments/environment';
 
 @Injectable()
 export class AuthInterceptorService implements HttpInterceptor {
-  private excludedUrls = [
-    environment.API_URL + '/auth/registration/',
-    environment.API_URL + '/auth/registration/verify-email/',
-    environment.API_URL + '/auth/password/reset/',
-    environment.API_URL + '/auth/token/',
-    environment.API_URL + '/auth/login/',
-  ];
+  private excludedUrls = Object.values(AuthUrls);
 
   constructor(
     private authService: AuthService,

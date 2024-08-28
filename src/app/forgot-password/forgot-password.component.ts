@@ -1,9 +1,8 @@
 import { AfterViewInit, Component, TemplateRef, ViewChild } from '@angular/core';
 import { MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { environment } from '../../environments/environment';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../auth.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ToolbarService } from '../toolbar.service';
 import {
   MatAccordion,
@@ -43,11 +42,13 @@ import { MessageComponent } from '../message/message.component';
 })
 export class ForgotPasswordComponent implements AfterViewInit {
   forgotForm = new FormGroup({
-    email: new FormControl(environment.TEST_EMAIL ?? '', [Validators.required, Validators.email]),
+    email: new FormControl('', [Validators.required, Validators.email]),
   });
   @ViewChild('toolbarTemplate', { static: true }) toolbarTemplate!: TemplateRef<never>;
 
   constructor(
+    private route: ActivatedRoute,
+    private formBuilder: FormBuilder,
     private authService: AuthService,
     private router: Router,
     private toolbarService: ToolbarService,
@@ -58,6 +59,12 @@ export class ForgotPasswordComponent implements AfterViewInit {
     const viewContainerRef = this.toolbarService.getViewContainerRef();
     viewContainerRef.clear();
     viewContainerRef.createEmbeddedView(this.toolbarTemplate);
+    this.route.queryParams.subscribe((params) => {
+      const email = params['email'];
+      if (email) {
+        this.forgotForm.patchValue({ email });
+      }
+    });
   }
 
   onSubmit() {

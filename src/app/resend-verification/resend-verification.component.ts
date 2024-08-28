@@ -1,9 +1,8 @@
 import { AfterViewInit, Component, TemplateRef, ViewChild } from '@angular/core';
 import { MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { environment } from '../../environments/environment';
 import { AuthService } from '../auth.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ToolbarService } from '../toolbar.service';
 import {
   MatAccordion,
@@ -43,11 +42,12 @@ import { MessageService } from '../message.service';
 })
 export class ResendVerificationComponent implements AfterViewInit {
   resendForm = new FormGroup({
-    email: new FormControl(environment.TEST_EMAIL ?? '', [Validators.required, Validators.email]),
+    email: new FormControl('', [Validators.required, Validators.email]),
   });
   @ViewChild('toolbarTemplate', { static: true }) toolbarTemplate!: TemplateRef<never>;
 
   constructor(
+    private route: ActivatedRoute,
     private authService: AuthService,
     private router: Router,
     private toolbarService: ToolbarService,
@@ -58,16 +58,25 @@ export class ResendVerificationComponent implements AfterViewInit {
     const viewContainerRef = this.toolbarService.getViewContainerRef();
     viewContainerRef.clear();
     viewContainerRef.createEmbeddedView(this.toolbarTemplate);
+    this.route.queryParams.subscribe((params) => {
+      const email = params['email'];
+      if (email) {
+        this.resendForm.patchValue({ email });
+      }
+    });
   }
 
   onSubmit() {
     this.messageService.clearMessages();
     this.authService.resend(this.resendForm.value.email as string).subscribe({
       next: () => {
-        // this.errors = this.authService.getErrors();
-        // if (this.errors.length === 0) {
-        //   this.router.navigate(['/login']);
-        // }
+        if (this.messageService.messageCount === 0) {
+          this.messageService.addMessage({
+            type: 'info',
+            text: 'Verification email resent. Check your email...',
+            dismissible: true,
+          });
+        } // else messages were added by authService
       },
       error: (error) => {
         this.messageService.addMessage({

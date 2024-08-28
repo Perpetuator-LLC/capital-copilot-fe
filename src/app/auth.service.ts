@@ -17,16 +17,19 @@ export interface RegisterResponse {
   refresh?: string;
 }
 
+export const AuthUrls = {
+  login: environment.API_URL + '/auth/login/',
+  refreshToken: environment.API_URL + '/auth/token/refresh/',
+  register: environment.API_URL + '/auth/registration/',
+  verify: environment.API_URL + '/auth/registration/verify-email/',
+  resend: environment.API_URL + '/auth/registration/resend-email/',
+  forgot: environment.API_URL + '/auth/password/reset/',
+};
+
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private tokenUrl = environment.API_URL + '/auth/login/';
-  private refreshTokenUrl = environment.API_URL + '/auth/token/refresh/';
-  private registerUrl = environment.API_URL + '/auth/registration/';
-  private verifyUrl = environment.API_URL + '/auth/registration/verify-email/';
-  private resendUrl = environment.API_URL + '/auth/registration/resend-email/';
-  private forgotUrl = environment.API_URL + '/auth/password/reset/';
   private tokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(this.getToken());
   private loggedInSignal: WritableSignal<boolean> = signal(!this.isRefreshTokenExpired());
 
@@ -37,7 +40,7 @@ export class AuthService {
 
   forgot(email: string): Observable<RegisterResponse | null> {
     this.messageService.clearMessages();
-    return this.http.post<RegisterResponse>(this.forgotUrl, { email }).pipe(
+    return this.http.post<RegisterResponse>(AuthUrls.forgot, { email }).pipe(
       tap((response) => {
         this.messageService.addMessage({
           type: 'info',
@@ -61,10 +64,11 @@ export class AuthService {
 
   login(email: string, password: string): Observable<Token | null> {
     this.messageService.clearMessages();
-    return this.http.post<Token>(this.tokenUrl, { email, password }).pipe(
+
+    return this.http.post<Token>(AuthUrls.login, { email, password }).pipe(
       tap((response) => {
-        console.debug('Login response:', response);
-        // this.setSession(response)
+        // console.debug('Login response:', response);
+        this.setSession(response);
       }),
       catchError((error) => {
         console.error('Login error:', error);
@@ -75,17 +79,16 @@ export class AuthService {
             dismissible: true,
           });
         });
-        return of(null); // Ensuring that we always return an Observable of the same type
+        return of(null);
       }),
     );
   }
 
   resend(email: string): Observable<null> {
     this.messageService.clearMessages();
-    return this.http.post<null>(this.resendUrl, { email }).pipe(
+    return this.http.post<null>(AuthUrls.resend, { email }).pipe(
       tap((response: null) => {
         console.debug('Resend verification response:', response);
-        // this.setSession(response);
       }),
       catchError((error) => {
         console.error('Resend verification error:', error);
@@ -103,7 +106,7 @@ export class AuthService {
 
   verify(key: string): Observable<Token | null> {
     this.messageService.clearMessages();
-    return this.http.post<Token>(this.verifyUrl, { key }).pipe(
+    return this.http.post<Token>(AuthUrls.verify, { key }).pipe(
       tap((response: Token) => this.setSession(response)),
       catchError((error) => {
         console.error('Registration error: ', error);
@@ -125,7 +128,7 @@ export class AuthService {
     const password1 = password;
     const password2 = password;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this.http.post<any>(this.registerUrl, { username, email, password1, password2 }).pipe(
+    return this.http.post<any>(AuthUrls.register, { username, email, password1, password2 }).pipe(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       tap((response: any) => this.setSession(response)),
       catchError((error) => {
@@ -149,7 +152,7 @@ export class AuthService {
       this.logout();
       return of(null);
     }
-    return this.http.post<Token>(this.refreshTokenUrl, { refresh: refreshToken }).pipe(
+    return this.http.post<Token>(AuthUrls.refreshToken, { refresh: refreshToken }).pipe(
       tap((response) => this.updateSession(response)),
       catchError((error) => {
         console.debug('Logging out, due to error refreshing token:', error);
