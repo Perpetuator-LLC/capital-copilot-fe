@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ResendVerificationComponent } from './resend-verification.component';
 import { AuthService } from '../auth.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ToolbarService } from '../toolbar.service';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { of, throwError } from 'rxjs';
@@ -17,9 +17,9 @@ describe('ResendVerificationComponent', () => {
   let toolbarServiceMock: jasmine.SpyObj<ToolbarService>;
   let viewContainerRefMock: jasmine.SpyObj<ViewContainerRef>;
   let mockMessageService: jasmine.SpyObj<MessageService>;
+  let activatedRouteMock: jasmine.SpyObj<ActivatedRoute>;
 
   beforeEach(async () => {
-    // Mock the AuthService, Router, and ToolbarService
     authServiceMock = jasmine.createSpyObj('AuthService', ['forgot', 'getErrors', 'resend']);
     routerMock = jasmine.createSpyObj('Router', ['navigate']);
     toolbarServiceMock = jasmine.createSpyObj('ToolbarService', ['getViewContainerRef']);
@@ -32,16 +32,19 @@ describe('ResendVerificationComponent', () => {
     ]);
     mockMessageService.messages$ = of([]);
 
-    // Make getViewContainerRef return the mocked ViewContainerRef
+    activatedRouteMock = jasmine.createSpyObj('ActivatedRoute', ['snapshot', 'queryParams']);
+    activatedRouteMock.queryParams = of({});
+
     toolbarServiceMock.getViewContainerRef.and.returnValue(viewContainerRefMock);
 
     await TestBed.configureTestingModule({
       imports: [ReactiveFormsModule, NoopAnimationsModule, ResendVerificationComponent],
       providers: [
-        { provide: AuthService, useValue: authServiceMock }, // Use the mocked AuthService
+        { provide: AuthService, useValue: authServiceMock },
         { provide: Router, useValue: routerMock },
         { provide: ToolbarService, useValue: toolbarServiceMock },
         { provide: MessageService, useValue: mockMessageService },
+        { provide: ActivatedRoute, useValue: activatedRouteMock },
       ],
     }).compileComponents();
 

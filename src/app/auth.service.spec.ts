@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { AuthService } from './auth.service';
+import { AuthService, AuthUrls } from './auth.service';
 
 import { createTestJWT } from './jwt';
 
@@ -43,7 +43,7 @@ describe('AuthService', () => {
       // expect(localStorage.getItem('expires_at')).toBeTruthy();
     });
 
-    const req = httpMock.expectOne(service['tokenUrl']);
+    const req = httpMock.expectOne(AuthUrls.login);
     expect(req.request.method).toBe('POST');
     req.flush(mockResponse);
   });
@@ -75,7 +75,7 @@ describe('AuthService', () => {
       expect(localStorage.setItem).toHaveBeenCalledWith('expires_at', jasmine.any(String));
     });
 
-    const req = httpMock.expectOne(service['refreshTokenUrl']);
+    const req = httpMock.expectOne(AuthUrls.refreshToken);
     expect(req.request.method).toBe('POST');
     req.flush(mockResponse);
   });
