@@ -54,24 +54,23 @@ describe('LoginComponent', () => {
   // });
 
   it('should call AuthService login on form submit', () => {
-    authService.getErrors.and.returnValue([]);
     authService.login.and.returnValue(
       of({
         access: createTestJWT({}),
         refresh: createTestJWT({}, 3600 * 24),
       }),
     );
-    component.loginForm.setValue({ username: 'testuser', password: 'testpassword' });
+    component.loginForm.setValue({ email: 'test@example.com', password: 'testpassword' });
     component.onSubmit();
 
-    expect(authService.login).toHaveBeenCalledWith('testuser', 'testpassword');
+    expect(authService.login).toHaveBeenCalledWith('test@example.com', 'testpassword');
     expect(router.navigate).toHaveBeenCalledWith(['/charts']);
   });
 
   it('should display validation errors when form is invalid', () => {
-    component.loginForm.setValue({ username: '', password: '' });
+    component.loginForm.setValue({ email: '', password: '' });
 
-    const usernameControl = component.loginForm.controls['username'];
+    const usernameControl = component.loginForm.controls['email'];
     const passwordControl = component.loginForm.controls['password'];
 
     expect(usernameControl.valid).toBeFalse();
@@ -82,7 +81,7 @@ describe('LoginComponent', () => {
   });
 
   it('should be valid when form is filled correctly', () => {
-    component.loginForm.setValue({ username: 'testuser', password: 'testpassword' });
+    component.loginForm.setValue({ email: 'test@example.com', password: 'testpassword' });
 
     expect(component.loginForm.valid).toBeTrue();
   });

@@ -9,10 +9,11 @@ import { environment } from '../environments/environment';
 @Injectable()
 export class AuthInterceptorService implements HttpInterceptor {
   private excludedUrls = [
-    environment.API_URL + '/api/forgot/',
-    environment.API_URL + '/api/register/',
-    environment.API_URL + '/api/token/',
-    environment.API_URL + '/api/token/refresh/',
+    environment.API_URL + '/auth/registration/',
+    environment.API_URL + '/auth/registration/verify-email/',
+    environment.API_URL + '/auth/password/reset/',
+    environment.API_URL + '/auth/token/',
+    environment.API_URL + '/auth/login/',
   ];
 
   constructor(

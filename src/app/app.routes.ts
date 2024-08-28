@@ -56,6 +56,22 @@ export const routes: Routes = [
     loadComponent: () => import('./forgot-password/forgot-password.component').then((c) => c.ForgotPasswordComponent),
     title: 'Forgot Password',
   },
+  {
+    path: 'verify',
+    loadComponent: () => import('./verify-email/verify-email.component').then((c) => c.VerifyEmailComponent),
+    title: 'Verify Email',
+  },
+  {
+    path: 'resend',
+    loadComponent: () =>
+      import('./resend-verification/resend-verification.component').then((c) => c.ResendVerificationComponent),
+    title: 'Resend Verification',
+  },
+  {
+    path: 'reset',
+    loadComponent: () => import('./reset-password/reset-password.component').then((c) => c.ResetPasswordComponent),
+    title: 'Reset Password',
+  },
 ];
 
 export class AppRoutingModule {}

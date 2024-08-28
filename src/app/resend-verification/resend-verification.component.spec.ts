@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ForgotPasswordComponent } from './forgot-password.component';
+import { ResendVerificationComponent } from './resend-verification.component';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
 import { ToolbarService } from '../toolbar.service';
@@ -9,14 +9,14 @@ import { ViewContainerRef } from '@angular/core';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MessageService } from '../message.service';
 
-describe('ForgotPasswordComponent', () => {
-  let component: ForgotPasswordComponent;
-  let fixture: ComponentFixture<ForgotPasswordComponent>;
+describe('ResendVerificationComponent', () => {
+  let component: ResendVerificationComponent;
+  let fixture: ComponentFixture<ResendVerificationComponent>;
   let authServiceMock: jasmine.SpyObj<AuthService>;
   let routerMock: jasmine.SpyObj<Router>;
   let toolbarServiceMock: jasmine.SpyObj<ToolbarService>;
   let viewContainerRefMock: jasmine.SpyObj<ViewContainerRef>;
-  let messageServiceMock: jasmine.SpyObj<MessageService>;
+  let mockMessageService: jasmine.SpyObj<MessageService>;
 
   beforeEach(async () => {
     // Mock the AuthService, Router, and ToolbarService
@@ -24,28 +24,28 @@ describe('ForgotPasswordComponent', () => {
     routerMock = jasmine.createSpyObj('Router', ['navigate']);
     toolbarServiceMock = jasmine.createSpyObj('ToolbarService', ['getViewContainerRef']);
     viewContainerRefMock = jasmine.createSpyObj('ViewContainerRef', ['clear', 'createEmbeddedView']);
-    messageServiceMock = jasmine.createSpyObj('MessageService', [
+    mockMessageService = jasmine.createSpyObj('MessageService', [
       'addMessage',
       'clearMessages',
       'removeMessage',
       'messageCount',
     ]);
-    messageServiceMock.messages$ = of([]);
+    mockMessageService.messages$ = of([]);
 
     // Make getViewContainerRef return the mocked ViewContainerRef
     toolbarServiceMock.getViewContainerRef.and.returnValue(viewContainerRefMock);
 
     await TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, NoopAnimationsModule, ForgotPasswordComponent],
+      imports: [ReactiveFormsModule, NoopAnimationsModule, ResendVerificationComponent],
       providers: [
         { provide: AuthService, useValue: authServiceMock }, // Use the mocked AuthService
         { provide: Router, useValue: routerMock },
         { provide: ToolbarService, useValue: toolbarServiceMock },
-        { provide: MessageService, useValue: messageServiceMock },
+        { provide: MessageService, useValue: mockMessageService },
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ForgotPasswordComponent);
+    fixture = TestBed.createComponent(ResendVerificationComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -55,7 +55,7 @@ describe('ForgotPasswordComponent', () => {
   });
 
   it('should initialize the form with an email control and validators', () => {
-    const emailControl = component.forgotForm.get('email');
+    const emailControl = component.resendForm.get('email');
     expect(emailControl).toBeTruthy();
     expect(emailControl?.hasValidator(Validators.required)).toBeTrue();
     expect(emailControl?.hasValidator(Validators.email)).toBeTrue();
@@ -68,22 +68,22 @@ describe('ForgotPasswordComponent', () => {
     expect(viewContainerRefMock.createEmbeddedView).toHaveBeenCalledWith(component.toolbarTemplate);
   });
 
-  it('should call authService.forgot on successful submission', () => {
-    authServiceMock.forgot.and.returnValue(of({ access: 'dummy-access-token', refresh: 'dummy-refresh-token' }));
+  it('should call authService.resend and navigate to login on successful submission', () => {
+    authServiceMock.resend.and.returnValue(of(null));
 
     component.onSubmit();
 
-    expect(authServiceMock.forgot).toHaveBeenCalledWith(component.forgotForm.value.email as string);
+    expect(authServiceMock.resend).toHaveBeenCalledWith(component.resendForm.value.email as string);
   });
 
   it('should handle errors and not navigate on failed submission', () => {
     const errorResponse = 'A special error occurred';
-    authServiceMock.forgot.and.returnValue(throwError(() => new Error(errorResponse)));
+    authServiceMock.resend.and.returnValue(throwError(() => new Error(errorResponse)));
 
     component.onSubmit();
 
-    expect(authServiceMock.forgot).toHaveBeenCalledWith(component.forgotForm.value.email as string);
+    expect(authServiceMock.resend).toHaveBeenCalledWith(component.resendForm.value.email as string);
     expect(routerMock.navigate).not.toHaveBeenCalled();
-    expect(messageServiceMock.addMessage).toHaveBeenCalled();
+    expect(mockMessageService.addMessage).toHaveBeenCalled();
   });
 });

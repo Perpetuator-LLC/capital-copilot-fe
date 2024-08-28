@@ -1,7 +1,7 @@
 import { Component, OnInit, TemplateRef, ViewChild, AfterViewInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../auth.service';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
 import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
@@ -16,6 +16,8 @@ import {
 import { MatIcon } from '@angular/material/icon';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { ToolbarService } from '../toolbar.service';
+import { MessageService } from '../message.service';
+import { MessageComponent } from '../message/message.component';
 
 @Component({
   selector: 'app-register',
@@ -38,15 +40,15 @@ import { ToolbarService } from '../toolbar.service';
     MatExpansionPanelHeader,
     MatIcon,
     MatCheckbox,
+    MessageComponent,
+    RouterLink,
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
 })
 export class RegisterComponent implements OnInit, AfterViewInit {
   // TODO: Add validation equivalent to back-end
-  errors: string[] = [];
   registerForm = this.fb.group({
-    username: [environment.TEST_USERNAME ?? '', [Validators.required, Validators.minLength(2)]],
     email: [environment.TEST_EMAIL ?? '', [Validators.required, Validators.email]],
     password: [environment.TEST_PASSWORD ?? '', [Validators.required, Validators.minLength(6)]],
     acceptTerms: [false, Validators.requiredTrue],
@@ -58,6 +60,7 @@ export class RegisterComponent implements OnInit, AfterViewInit {
     private authService: AuthService,
     private router: Router,
     private toolbarService: ToolbarService,
+    private messageService: MessageService,
   ) {}
 
   ngAfterViewInit() {
@@ -68,7 +71,6 @@ export class RegisterComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.registerForm = this.fb.group({
-      username: [environment.TEST_USERNAME ?? '', [Validators.required]],
       email: [environment.TEST_EMAIL ?? '', [Validators.required, Validators.email]],
       password: [environment.TEST_PASSWORD ?? '', [Validators.required, Validators.minLength(6)]],
       acceptTerms: [false, Validators.requiredTrue],
@@ -76,29 +78,48 @@ export class RegisterComponent implements OnInit, AfterViewInit {
   }
 
   onSubmit(): void {
-    this.errors = [];
+    this.messageService.clearMessages();
     if (this.registerForm.valid) {
-      const username = this.registerForm.get('username')!.value!;
       const email = this.registerForm.get('email')!.value!;
       const password = this.registerForm.get('password')!.value!;
 
-      this.authService.register(username, email, password).subscribe({
+      this.authService.register(email, password).subscribe({
         next: (token) => {
           if (token) {
-            console.log('Registration successful', token);
+            console.debug('Registration successful');
+            this.messageService.addMessage({
+              type: 'success',
+              text: 'Registration successful! Check your email for a verification link.',
+              dismissible: true,
+            });
             this.router.navigate(['/charts']);
           } else {
-            console.log('Registration failed with no token returned');
-            for (const error of this.authService.getErrors()) {
-              this.errors.push(error.toString());
-            }
-            if (this.errors.length === 0) {
-              this.errors.push('Registration failed. No token returned from authentication service.');
+            // console.error('Registration failed while authenticating:', this.authService.getErrors());
+            // const authErrors = this.authService.getErrors();
+            // for (const error of authErrors) {
+            //   this.messageService.addMessage({
+            //     type: 'error',
+            //     text: 'Registration failed while authenticating: ' + error.toString(),
+            //     dismissible: true,
+            //   });
+            // }
+            // if (authErrors.length === 0) {
+            // Expect a message when no token is returned, but if not then add one
+            if (this.messageService.messageCount === 0) {
+              this.messageService.addMessage({
+                type: 'error',
+                text: 'Registration failed with no token returned.',
+                dismissible: true,
+              });
             }
           }
         },
         error: (error) => {
-          this.errors.push('Registration failed:' + error.toString());
+          this.messageService.addMessage({
+            type: 'error',
+            text: 'Registration failed: ' + error.toString(),
+            dismissible: true,
+          });
           console.error('Registration failed', error);
         },
       });

@@ -14,6 +14,8 @@ import {
 import { MatIcon } from '@angular/material/icon';
 import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatButton } from '@angular/material/button';
+import { MessageService } from '../message.service';
+import { MessageComponent } from '../message/message.component';
 
 @Component({
   selector: 'app-forgot-password',
@@ -34,12 +36,12 @@ import { MatButton } from '@angular/material/button';
     MatCardTitle,
     MatButton,
     ReactiveFormsModule,
+    MessageComponent,
   ],
   templateUrl: './forgot-password.component.html',
   styleUrl: './forgot-password.component.scss',
 })
 export class ForgotPasswordComponent implements AfterViewInit {
-  errors: string[] = [];
   forgotForm = new FormGroup({
     email: new FormControl(environment.TEST_EMAIL ?? '', [Validators.required, Validators.email]),
   });
@@ -49,6 +51,7 @@ export class ForgotPasswordComponent implements AfterViewInit {
     private authService: AuthService,
     private router: Router,
     private toolbarService: ToolbarService,
+    private messageService: MessageService,
   ) {}
 
   ngAfterViewInit() {
@@ -58,17 +61,24 @@ export class ForgotPasswordComponent implements AfterViewInit {
   }
 
   onSubmit() {
-    this.errors = [];
+    this.messageService.clearMessages();
     this.authService.forgot(this.forgotForm.value.email as string).subscribe({
       next: () => {
-        this.errors = this.authService.getErrors();
-        if (this.errors.length === 0) {
-          this.router.navigate(['/login']);
+        if (this.messageService.messageCount === 0) {
+          this.messageService.addMessage({
+            type: 'success',
+            text: 'Password reset email sent!',
+            dismissible: true,
+          });
         }
       },
       error: (error) => {
-        this.errors.push('Reset failed ' + error.toString());
-        console.error('Reset failed', error);
+        this.messageService.addMessage({
+          type: 'error',
+          text: 'Password reset failed: ' + error.toString(),
+          dismissible: true,
+        });
+        console.error('Password reset failed', error);
       },
     });
   }

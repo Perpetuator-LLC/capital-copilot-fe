@@ -1,0 +1,24 @@
+.message-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  width: 300px;
+  color: black;
+}
+
+.error {
+  background-color: #ffdddd;
+}
+
+.warning {
+  background-color: #fff8db;
+}
+
+.info {
+  background-color: #d9f2ff;
+}
+
+.success {
+  background-color: #d9ffd9;
+}

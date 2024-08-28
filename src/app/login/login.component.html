@@ -1,33 +1,9 @@
 <ng-template #toolbarTemplate>
   <h1>Login</h1>
 </ng-template>
-
+<app-message></app-message>
 <link rel="stylesheet" href="login.component.scss" />
 <div class="login-container">
-  @if (errors && errors.length > 0) {
-    <div class="error-container">
-      <mat-card>
-        <mat-card-header>
-          <mat-card-title>Register Errors</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <mat-accordion multi>
-            <mat-expansion-panel expanded>
-              <mat-expansion-panel-header>
-                <mat-panel-title>Error Messages</mat-panel-title>
-              </mat-expansion-panel-header>
-              @for (error of errors; track error) {
-                <div class="error-message">
-                  <mat-icon color="warn">error</mat-icon>
-                  {{ error }}
-                </div>
-              }
-            </mat-expansion-panel>
-          </mat-accordion>
-        </mat-card-content>
-      </mat-card>
-    </div>
-  }
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
     <mat-card class="login-card">
       <mat-card-header>
@@ -36,7 +12,7 @@
       <mat-card-content>
         <mat-form-field appearance="fill">
           <mat-label>Username</mat-label>
-          <input matInput type="text" id="username" formControlName="username" autocomplete="username" />
+          <input matInput type="text" id="email" formControlName="email" autocomplete="email" />
         </mat-form-field>
         <mat-form-field appearance="fill">
           <mat-label>Password</mat-label>

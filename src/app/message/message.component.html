@@ -1,0 +1,26 @@
+@if (messages.length > 0) {
+  <link rel="stylesheet" href="message.component.scss" />
+  <div class="message-container">
+    @for (message of messages; track message; let index = $index) {
+      <mat-card>
+        <mat-card-content [ngClass]="message.type">
+          @if (message.type === 'error') {
+            <mat-icon color="warn">error</mat-icon>
+          } @else if (message.type === 'info') {
+            <mat-icon color="primary">info</mat-icon>
+          } @else if (message.type === 'success') {
+            <mat-icon color="primary">check_circle</mat-icon>
+          } @else if (message.type === 'warning') {
+            <mat-icon color="warn">warning</mat-icon>
+          }
+          {{ message.text }}
+          @if (message.dismissible !== false) {
+            <button mat-icon-button (click)="removeMessage(index)" aria-label="Close">
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+}

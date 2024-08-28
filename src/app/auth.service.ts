@@ -5,6 +5,7 @@ import { catchError, switchMap, tap } from 'rxjs/operators';
 import { JWT, Token } from './types';
 import { decodeJWT } from './jwt';
 import { environment } from '../environments/environment';
+import { MessageService } from './message.service';
 
 export interface RegisterError {
   messages: string[];
@@ -20,61 +21,126 @@ export interface RegisterResponse {
   providedIn: 'root',
 })
 export class AuthService {
-  private errors: string[] = [];
-  private tokenUrl = environment.API_URL + '/api/token/';
-  private refreshTokenUrl = environment.API_URL + '/api/token/refresh/';
-  private registerUrl = environment.API_URL + '/api/register/';
-  private forgotUrl = environment.API_URL + '/api/forgot/';
+  private tokenUrl = environment.API_URL + '/auth/login/';
+  private refreshTokenUrl = environment.API_URL + '/auth/token/refresh/';
+  private registerUrl = environment.API_URL + '/auth/registration/';
+  private verifyUrl = environment.API_URL + '/auth/registration/verify-email/';
+  private resendUrl = environment.API_URL + '/auth/registration/resend-email/';
+  private forgotUrl = environment.API_URL + '/auth/password/reset/';
   private tokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(this.getToken());
   private loggedInSignal: WritableSignal<boolean> = signal(!this.isRefreshTokenExpired());
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private messageService: MessageService,
+  ) {}
 
   forgot(email: string): Observable<RegisterResponse | null> {
-    this.errors = [];
+    this.messageService.clearMessages();
     return this.http.post<RegisterResponse>(this.forgotUrl, { email }).pipe(
-      tap((response) => this.errors.push(response.detail ? response.detail : 'Password reset email sent')),
+      tap((response) => {
+        this.messageService.addMessage({
+          type: 'info',
+          text: response.detail ? response.detail : 'Password reset email sent',
+          dismissible: true,
+        });
+      }),
       catchError((error) => {
         console.error('Login error:', error);
         Object.keys(error.error).forEach((key) => {
-          this.errors.push(`Login error (${key}): ${error.error[key]}`);
+          this.messageService.addMessage({
+            type: 'error',
+            text: `Login error (${key}): ${error.error[key]}`,
+            dismissible: true,
+          });
         });
         return of(null); // Ensuring that we always return an Observable of the same type
       }),
     );
   }
 
-  login(username: string, password: string): Observable<Token | null> {
-    this.errors = [];
-    return this.http.post<Token>(this.tokenUrl, { username, password }).pipe(
-      tap((response) => this.setSession(response)),
+  login(email: string, password: string): Observable<Token | null> {
+    this.messageService.clearMessages();
+    return this.http.post<Token>(this.tokenUrl, { email, password }).pipe(
+      tap((response) => {
+        console.debug('Login response:', response);
+        // this.setSession(response)
+      }),
       catchError((error) => {
         console.error('Login error:', error);
         Object.keys(error.error).forEach((key) => {
-          this.errors.push(`Login error (${key}): ${error.error[key]}`);
+          this.messageService.addMessage({
+            type: 'error',
+            text: `Login error (${key}): ${error.error[key]}`,
+            dismissible: true,
+          });
         });
         return of(null); // Ensuring that we always return an Observable of the same type
       }),
     );
   }
 
-  register(username: string, email: string, password: string): Observable<Token | null> {
-    this.errors = [];
-    return this.http.post<Token>(this.registerUrl, { username, email, password }).pipe(
-      tap((response: Token) => this.setSession(response)),
+  resend(email: string): Observable<null> {
+    this.messageService.clearMessages();
+    return this.http.post<null>(this.resendUrl, { email }).pipe(
+      tap((response: null) => {
+        console.debug('Resend verification response:', response);
+        // this.setSession(response);
+      }),
       catchError((error) => {
-        console.error('Registration error: ', error);
+        console.error('Resend verification error:', error);
         Object.keys(error.error).forEach((key) => {
-          this.errors.push(`Registration error (${key}): ${error.error[key]}`);
+          this.messageService.addMessage({
+            type: 'error',
+            text: `Resend verification error (${key}): ${error.error[key]}`,
+            dismissible: true,
+          });
         });
-        // this.errors.push('Registration error: ' + JSON.stringify(error.error, null, 2));
         return of(null);
       }),
     );
   }
 
-  getErrors(): string[] {
-    return this.errors;
+  verify(key: string): Observable<Token | null> {
+    this.messageService.clearMessages();
+    return this.http.post<Token>(this.verifyUrl, { key }).pipe(
+      tap((response: Token) => this.setSession(response)),
+      catchError((error) => {
+        console.error('Registration error: ', error);
+        Object.keys(error.error).forEach((key) => {
+          this.messageService.addMessage({
+            type: 'error',
+            text: `Registration error (${key}): ${error.error[key]}`,
+            dismissible: true,
+          });
+        });
+        return of(null);
+      }),
+    );
+  }
+
+  register(email: string, password: string): Observable<Token | null> {
+    this.messageService.clearMessages();
+    const username = email;
+    const password1 = password;
+    const password2 = password;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return this.http.post<any>(this.registerUrl, { username, email, password1, password2 }).pipe(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      tap((response: any) => this.setSession(response)),
+      catchError((error) => {
+        console.error('Registration error: ', error);
+        Object.keys(error.error).forEach((key) => {
+          this.messageService.addMessage({
+            type: 'error',
+            text: `Registration error (${key}): ${error.error[key]}`,
+            dismissible: true,
+          });
+        });
+        // this.errors.push('Registration error: ' + JSON.stringify(error.error, null, 2));
+        return of(null);
+      }),
+    );
   }
 
   refreshToken(): Observable<Token | null> {
